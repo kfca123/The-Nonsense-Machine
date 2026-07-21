@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>~*~ThE nOnSeNsE mAcHiNe~*~ (BEST WEBSITE EVER)</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#00ff00">
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:"Comic Sans MS", "Comic Sans", cursive;
+    color:#000;
+    min-height:100vh;
+    /* eye-searing checkerboard, a GeoCities classic */
+    background:
+      repeating-conic-gradient(#00ff00 0% 25%, #ff00ff 0% 50%) 0 0/60px 60px fixed;
+    cursor:crosshair;
+  }
+  .stage{width:820px; max-width:98vw; margin:0 auto; padding:10px 0 40px;}
+
+  marquee{
+    background:#000; color:#ffff00; font-weight:bold; font-size:18px;
+    border:4px ridge #ff0000; padding:4px 0; margin-bottom:10px;
+  }
+  .card{
+    background:#ffffcc;
+    border:8px outset #c0c0c0;
+    padding:24px;
+    box-shadow:8px 8px 0 #000;
+  }
+  h1{
+    font-family:Impact, "Arial Black", sans-serif;
+    font-size:54px; text-align:center; letter-spacing:2px;
+    color:#ff00ff;
+    text-shadow:3px 3px 0 #00ffff, 6px 6px 0 #0000ff, 9px 9px 0 #000;
+    transform:rotate(-2deg);
+    -webkit-text-stroke:2px #000;
+  }
+  .tagline{
+    text-align:center; font-size:17px; font-weight:bold; color:#ff0000;
+    margin-top:10px; animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .blink{animation:blink 1s steps(1) infinite;}
+  .big-emoji{text-align:center; font-size:60px; margin:6px 0; animation:spin 4s linear infinite; display:block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .construction{
+    text-align:center; background:repeating-linear-gradient(45deg,#ffff00 0 20px,#000 20px 40px);
+    color:#fff; font-weight:bold; font-size:15px; padding:6px; margin:12px 0;
+    border:3px solid #000; text-shadow:2px 2px 0 #000; letter-spacing:1px;
+  }
+
+  .section-label{
+    font-size:16px; font-weight:bold; color:#0000ff;
+    text-decoration:underline; margin:20px 0 8px;
+  }
+  .players{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    background:#00ffff; border:3px outset #808080; padding:6px 12px;
+    font-weight:bold; display:flex; align-items:center; gap:6px; font-size:15px;
+  }
+  .chip button{
+    background:#ff0000; color:#fff; border:2px outset #fff; cursor:pointer;
+    font-weight:bold; font-family:inherit; padding:0 6px;
+  }
+  .row{display:flex; gap:10px; margin-top:8px;}
+  input[type=text], textarea{
+    background:#fff; border:4px inset #808080;
+    color:#000; padding:10px 14px; font-size:16px; width:100%;
+    font-family:"Comic Sans MS", cursive; outline:none;
+  }
+  textarea{resize:none; height:110px; line-height:1.5;}
+  .btn{
+    border:5px outset #c0c0c0; background:#c0c0c0;
+    padding:10px 22px; font-size:16px; font-weight:bold; cursor:pointer;
+    font-family:"Comic Sans MS", cursive; color:#000;
+  }
+  .btn:hover{background:#00ff00;}
+  .btn:active{border-style:inset;}
+  .btn-main{
+    background:#ff00ff; color:#ffff00; width:100%; margin-top:22px;
+    font-size:20px; padding:14px; text-shadow:2px 2px 0 #000;
+    border:6px outset #ff69b4;
+  }
+  .btn-main:hover{background:#ff0000;}
+  .btn-sub{background:#c0c0c0;}
+  .btn:disabled{color:#808080; background:#c0c0c0; cursor:not-allowed;}
+  .rounds{display:flex; gap:10px;}
+  .rounds .btn-sub.on{background:#00ff00; border-style:inset;}
+  .hidden{display:none !important;}
+
+  .new-badge{
+    display:inline-block; background:#ff0000; color:#ffff00; font-weight:bold;
+    padding:2px 10px; transform:rotate(-10deg); border:2px dashed #ffff00;
+    animation:blink .7s steps(1) infinite; font-size:14px;
+  }
+
+  /* handoff */
+  .handoff{text-align:center;}
+  .handoff .who{
+    font-size:46px; font-weight:bold; color:#0000ff; margin:8px 0;
+    font-family:Impact, sans-serif; text-shadow:3px 3px 0 #00ff00;
+    text-decoration:underline wavy #ff0000;
+  }
+  .handoff p{font-size:17px; font-weight:bold;}
+  .secret{color:#ff0000; font-size:22px; animation:blink .8s steps(1) infinite;}
+
+  /* write screen */
+  .prev-line{
+    background:#fff; border:5px ridge #0000ff;
+    padding:14px 18px; font-size:18px; line-height:1.5; font-style:italic;
+  }
+  .prev-author{color:#808080; font-size:13px; margin-top:6px; font-style:normal; font-weight:bold;}
+  .turn-tag{font-size:15px; text-align:center; margin-bottom:12px; font-weight:bold;}
+  .turn-tag b{color:#ff00ff; font-size:18px;}
+  .charcount{color:#808080; font-size:13px; text-align:right; margin-top:4px; font-weight:bold;}
+
+  /* timer */
+  .timer-box{
+    text-align:center; background:#000; color:#00ff00; font-weight:bold;
+    font-size:18px; padding:8px; border:4px ridge #ff0000; margin-bottom:14px;
+    letter-spacing:1px;
+  }
+  .timer{
+    color:#ff0000; font-family:"Courier New", monospace; font-size:26px;
+    letter-spacing:4px; border:2px inset #808080; padding:0 10px; background:#000;
+  }
+  .timer-box.panic{animation:blink .5s steps(1) infinite; border-color:#ffff00;}
+  .timer-box.panic .timer{color:#ffff00;}
+
+  /* alarm */
+  .alarm{
+    margin-top:12px; background:#ff0000; border:5px ridge #ffff00;
+    padding:12px 16px; color:#ffff00; font-weight:bold;
+    font-size:17px; text-align:center; opacity:0; text-transform:uppercase;
+    text-shadow:2px 2px 0 #000;
+  }
+  .alarm.show{opacity:1; animation:shake .4s, blink .5s steps(1) 4;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)}
+    40%{transform:translateX(10px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+  }
+  textarea.blocked{border-color:#ff0000; animation:shake .4s; background:#ffcccc;}
+
+  /* reveal */
+  .story-line{
+    background:#fff; border:4px ridge #808080; padding:12px 16px; margin-bottom:10px;
+    font-size:18px; line-height:1.5; opacity:0; transform:translateY(14px);
+    transition:opacity .5s, transform .5s;
+  }
+  .story-line.in{opacity:1; transform:translateY(0);}
+  .story-line .by{
+    color:#fff; background:#0000ff; font-size:12px; font-weight:bold;
+    display:inline-block; padding:1px 8px; margin-bottom:5px; text-transform:uppercase;
+  }
+  .story-line:nth-child(4n+1){background:#ffffcc;}
+  .story-line:nth-child(4n+2){background:#ccffcc;}
+  .story-line:nth-child(4n+3){background:#ccffff;}
+  .story-line:nth-child(4n+4){background:#ffccff;}
+  .the-end{
+    text-align:center; font-size:38px; margin-top:16px; opacity:0; transition:opacity .8s;
+    font-family:Impact, sans-serif; color:#ff0000; text-shadow:3px 3px 0 #ffff00, 5px 5px 0 #000;
+  }
+  .the-end.in{opacity:1;}
+  h2{
+    font-size:34px; text-align:center; margin-bottom:16px;
+    font-family:Impact, sans-serif; color:#0000ff; text-shadow:3px 3px 0 #00ffff;
+  }
+  .confetti{position:fixed; top:-20px; font-size:24px; animation:fall linear forwards; z-index:99;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);}}
+
+  .footer{
+    text-align:center; margin-top:14px; background:#000; color:#00ff00;
+    font-size:13px; padding:8px; border:3px ridge #00ff00; font-weight:bold;
+  }
+  .footer .counter{
+    background:#000; color:#ff0000; font-family:"Courier New", monospace;
+    font-size:16px; letter-spacing:3px; border:2px inset #808080; padding:1px 6px;
+  }
+  .webring{color:#00ffff; text-decoration:underline; cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <marquee scrollamount="8">★·.·´¯`·.·★ WeLcOmE tO tHe NoNsEnSe MaChInE ★·.·´¯`·.·★ THE #1 STORY GAME ON THE INFORMATION SUPERHIGHWAY ★ NO BAD WORDS ALLOWED (WE HAVE TECHNOLOGY) ★ TELL UR FRIENDS ★</marquee>
+
+  <!-- SETUP -->
+  <div class="card" id="setup">
+    <span class="big-emoji">📖</span>
+    <h1>ThE NoNsEnSe MaChInE</h1>
+    <p class="tagline">!!! EVERYONE ADDS ONE SENTENCE !!! U ONLY SEE THE LAST ONE !!!</p>
+    <div class="construction">🚧🚧 UNDER CONSTRUCTION SINCE 1998 🚧🚧</div>
+
+    <div class="section-label">Who's playing?? (2–8) <span class="new-badge">NEW!!</span></div>
+    <div class="players" id="playerChips"></div>
+    <div class="row">
+      <input type="text" id="nameInput" maxlength="16" placeholder="type ur name here...">
+      <button class="btn btn-sub" id="addPlayer">ADD ➕</button>
+    </div>
+
+    <div class="section-label">How many sentences each???</div>
+    <div class="rounds" id="roundBtns">
+      <button class="btn btn-sub" data-r="1">1</button>
+      <button class="btn btn-sub on" data-r="2">2</button>
+      <button class="btn btn-sub" data-r="3">3</button>
+    </div>
+
+    <button class="btn btn-main" id="startBtn" disabled>need at least 2 players...</button>
+
+    <div class="footer">
+      You are visitor number <span class="counter" id="hitCounter">0000000</span> !!!<br>
+      Best viewed in Netscape Navigator 4.0 at 800x600 resolution |
+      <span class="webring" onclick="alert('the webring died in 2003. we miss it every day.')">JOIN OUR WEBRING</span><br>
+      (C) 1998 nonsense industries. all rights reversed.
+    </div>
+  </div>
+
+  <!-- HANDOFF -->
+  <div class="card handoff hidden" id="handoff">
+    <span class="big-emoji">🤫</span>
+    <p>~*~ pass the computer to ~*~</p>
+    <div class="who" id="handoffName">???</div>
+    <p>everyone else: <span class="secret">NO PEEKING!!!</span></p>
+    <p style="font-size:13px; margin-top:8px;">(peeking is punishable by 100 years of dial-up internet)</p>
+    <button class="btn btn-main" id="readyBtn">im alone i swear 👀</button>
+  </div>
+
+  <!-- WRITE -->
+  <div class="card hidden" id="write">
+    <div class="timer-box">⏰ TIME LEFT: <span class="timer" id="timer">60</span> ⏰</div>
+    <div class="turn-tag" id="turnTag"></div>
+    <div class="section-label" id="prevLabel">the ONLY word u get from the last sentence (good luck!!):</div>
+    <div class="prev-line" id="prevLine"></div>
+    <div class="section-label">add ur sentence:</div>
+    <textarea id="sentenceBox" maxlength="140" placeholder="continue the story... make it WEIRD"></textarea>
+    <div class="charcount"><span id="charCount">0</span>/140</div>
+    <div class="alarm" id="alarm"></div>
+    <button class="btn btn-main" id="submitBtn">LOCK IT IN 🔒</button>
+  </div>
+
+  <!-- REVEAL -->
+  <div class="card hidden" id="reveal">
+    <h2>📜 ~*~ThE mAsTeRpIeCe~*~ 📜</h2>
+    <div id="storyBox"></div>
+    <div class="the-end" id="theEnd">🎬 THE END 🎬</div>
+    <button class="btn btn-main hidden" id="againBtn">WRITE ANOTHER ONE!! 🔁</button>
+  </div>
+
+</div>
+
+<script>
+/* ---------------- PROFANITY SHIELD ----------------
+   Blocks bad words AS YOU TYPE — including l33t tricks
+   (sh1t, f*u*c*k, etc). Input reverts instantly. */
+const LEET = {'4':'a','@':'a','3':'e','1':'i','!':'i','|':'i','0':'o','$':'s','5':'s','7':'t','+':'t','9':'g','8':'b','2':'z'};
+function deleet(s){
+  return s.toLowerCase().split('').map(c => LEET[c] || c).join('');
+}
+// squished: letters only, catches "f u c k" / "f.u.c.k"
+function squish(s){ return deleet(s).replace(/[^a-z]/g,''); }
+// words: for terms too risky to substring-match (ass→class, etc.)
+function words(s){ return deleet(s).replace(/[^a-z]/g,' ').split(/\s+/).filter(Boolean); }
+// collapse repeats: "fuuuuck" → "fuck"
+function collapse(s){ return s.replace(/(.)\1+/g,'$1'); }
+
+// substring matches across the WHOLE text (unambiguous, catches "f u c k" spacing)
+const STRONG = ['fuck','shit','bitch','cunt','nigg','faggot','whore','slut',
+  'asshole','arsehole','dickhead','jackass','dumbass','fatass','cocksuck',
+  'wanker','bollock','bastard','retard','douche','motherfuck','mofo',
+  'goddam','dammit','damnit','bullshit','hentai','dildo','orgasm','blowjob',
+  'handjob','jerkoff','jackoff','cumshot','tranny','biatch'];
+// substring matches inside a SINGLE word only (too short/risky to scan across
+// word boundaries — "of ukraine" must not trigger "fuk")
+const WORD_SUB = ['fuk','fck','fcuk','fuq','fux','shyt','btch','puss','porn'];
+// whole-word only (avoid blocking "class", "cockpit", "hello", "swanky", "therapist"…)
+const WORDLIST = ['ass','asses','azz','arse','hell','damn','dick','dicks','cock',
+  'cocks','piss','crap','fag','fags','hoe','hoes','tit','tits','titties','sex',
+  'sexy','seggs','secks','prick','pricks','penis','vagina','vag','boner','boners',
+  'cum','cumming','twat','twats','nut','nuts','balls','nude',
+  'nudes','horny','wank','wanks','thot','thots','rape','raped','rapist','anal',
+  'anus','clit','queef','milf','wtf','stfu','kys','gtfo','omfg','ffs','lmfao',
+  'lmao','negro','dyke','dykes','kike','chink','spic','coon','coons'];
+
+function isDirty(text){
+  const sq = squish(text), sqc = collapse(sq);
+  for(const w of STRONG){ if(sq.includes(w) || sqc.includes(w)) return true; }
+  for(const w of words(text)){
+    const wc = collapse(w);
+    if(WORDLIST.includes(w) || WORDLIST.includes(wc)) return true;
+    for(const s of WORD_SUB){ if(w.includes(s) || wc.includes(s)) return true; }
+  }
+  return false;
+}
+
+const ALARM_MSGS = [
+  "🚨 BLOCKED!! the principal has been notified (no he hasnt)",
+  "🧼 LANGUAGE!! this story is rated E for everyone!!",
+  "🕵️ nice try. the machine sees ALL l33t sp34k.",
+  "📵 that word has been CONFISCATED. see me after class.",
+  "🦆 blocked. try 'flabbergasted' instead, its a great word",
+  "🚫 DENIED. ur keyboard privileges are hanging by a thread",
+];
+let alarmIdx = 0;
+
+/* ---------------- GAME STATE ---------------- */
+const PROMPTS = [
+  "The school cafeteria ran out of everything except 4,000 pounds of pudding.",
+  "At exactly noon, every teacher in the school started communicating only in bird noises.",
+  "Dave the janitor finally revealed why the third-floor bathroom has been locked since 1997.",
+  "The class hamster escaped, but this time it was wearing a tiny business suit.",
+  "During the fire drill, everyone noticed the new kid was floating three inches off the ground.",
+  "The vending machine started dispensing things that were definitely not snacks.",
+  "Our substitute teacher walked in, and it was just three raccoons in a trench coat.",
+  "The Wi-Fi went down, and within minutes the school descended into medieval times.",
+  "Somebody microwaved fish in the teachers' lounge, and it awakened something ancient.",
+  "The morning announcements began with the words: 'Do not panic, but the gym is now a portal.'",
+  "The principal called an emergency assembly to announce he had been replaced by his twin.",
+  "Every clock in the school started running backwards at exactly 9:47 AM.",
+  "The lunch lady slid a tray forward and whispered, 'You didn't get this from me.'",
+  "A pigeon walked into first period, sat down, and started taking notes.",
+  "The school mascot costume began moving on its own, and nobody was inside it.",
+  "The math teacher wrote one number on the board and immediately called the police.",
+  "Somebody put googly eyes on everything in the science lab, including the substitute.",
+  "The library's oldest book started softly humming the school anthem.",
+  "The gym teacher announced today's sport would be 'competitive hiding.'",
+  "Every locker in hallway B opened at once, and they were all full of spaghetti.",
+  "The school bus took a wrong turn and drove directly into the year 1347.",
+  "A mysterious new kid arrived who claimed to be 'from the school across the void.'",
+  "The smartboard gained consciousness during a spelling quiz and refused to cooperate.",
+  "The fire alarm went off, but instead of ringing it just said 'uh oh' repeatedly.",
+  "The cafeteria introduced a new mystery meat that kept making eye contact with students.",
+  "Our field trip was canceled because the museum 'escaped.'",
+  "The school nurse prescribed everyone in third period exactly one juice box and a nap.",
+  "The chess club challenged the entire faculty to a duel at dawn.",
+  "Someone found a door in the basement labeled 'DO NOT OPEN UNTIL LUNCH.'",
+  "The intercom crackled and a voice said, 'Whoever took my sandwich has 24 hours.'",
+  "All the fish in the biology tank organized themselves into a perfect arrow pointing at Greg.",
+  "The drama club's fog machine malfunctioned and now the second floor is a mysterious realm.",
+  "The student council president was revealed to be four kindergartners in a coat.",
+  "Picture day was ruined when everyone's photos came out showing their true medieval selves.",
+  "The janitor's mop bucket started bubbling and glowing during fifth period.",
+  "A knight in full armor showed up asking about enrolling his horse.",
+  "The recess bell rang once, then apologized, then rang 500 more times.",
+  "The school's water fountain started dispensing chocolate milk and nobody questioned it fast enough.",
+  "The detention room was found completely empty except for a single note reading 'we are free.'",
+  "The teacher said 'pop quiz' and every calculator in the room began screaming.",
+];
+
+// no-repeat prompt picker: shuffles thru ALL prompts b4 repeating
+let promptBag = [];
+function nextPrompt(){
+  if(promptBag.length === 0){
+    promptBag = [...PROMPTS.keys()];
+    for(let i=promptBag.length-1; i>0; i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [promptBag[i], promptBag[j]] = [promptBag[j], promptBag[i]];
+    }
+  }
+  return PROMPTS[promptBag.pop()];
+}
+
+// what happens when u run out of time and wrote NOTHING
+const TIMEOUT_FILLERS = [
+  "froze like a deer in headlights and contributed absolutely nothing.",
+  "stared at the screen until the screen got uncomfortable.",
+  "was too slow, so a pigeon wrote this sentence instead. coo.",
+  "ran out of time and has brought shame upon this story.",
+  "panicked, typed nothing, and will be thinking about this moment for years.",
+  "let the clock win. the clock is undefeated.",
+  "blanked so hard that scientists want to study their brain.",
+];
+
+let players = [];
+let roundsEach = 2;
+let turnOrder = [];     // list of player indexes, one per sentence
+let turnPtr = 0;
+let story = [];         // {text, author}
+let cleanValue = "";
+
+const $ = id => document.getElementById(id);
+const screens = ['setup','handoff','write','reveal'];
+function show(id){ screens.forEach(s => $(s).classList.toggle('hidden', s!==id)); }
+
+/* ---- fake hit counter ---- */
+(function(){
+  let hits = +(localStorage.getItem('nonsenseHits') || 4216) + 1 + Math.floor(Math.random()*3);
+  localStorage.setItem('nonsenseHits', hits);
+  $('hitCounter').textContent = String(hits).padStart(7,'0');
+})();
+
+/* ---- setup ---- */
+function renderChips(){
+  $('playerChips').innerHTML = players.map((p,i) =>
+    `<span class="chip">${p} <button data-i="${i}">✕</button></span>`).join('') ||
+    '<span style="color:#808080; font-weight:bold;">nobody yet... so lonely 🦗</span>';
+  $('playerChips').querySelectorAll('button').forEach(b =>
+    b.onclick = () => { players.splice(+b.dataset.i,1); renderChips(); });
+  const ok = players.length >= 2;
+  $('startBtn').disabled = !ok;
+  $('startBtn').textContent = ok ? `START THE CHAOS!! 🎬 (${players.length} players)` : 'need at least 2 players...';
+}
+function addPlayer(){
+  const raw = $('nameInput').value.trim();
+  if(!raw) return;
+  if(isDirty(raw)){ $('nameInput').value=''; $('nameInput').placeholder='🚨 keep names school-safe!!'; return; }
+  if(players.length >= 8 || players.includes(raw)) return;
+  players.push(raw);
+  $('nameInput').value=''; renderChips(); $('nameInput').focus();
+}
+$('addPlayer').onclick = addPlayer;
+$('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') addPlayer(); });
+$('nameInput').addEventListener('input', e => {
+  if(isDirty(e.target.value)){ e.target.value=''; e.target.placeholder='🚨 nope!!'; }
+});
+$('roundBtns').querySelectorAll('.btn').forEach(b => b.onclick = () => {
+  roundsEach = +b.dataset.r;
+  $('roundBtns').querySelectorAll('.btn').forEach(x => x.classList.toggle('on', x===b));
+});
+renderChips();
+
+$('startBtn').onclick = () => {
+  turnOrder = [];
+  for(let r=0; r<roundsEach; r++) for(let i=0; i<players.length; i++) turnOrder.push(i);
+  turnPtr = 0;
+  story = [{ text: nextPrompt(), author: '🤖 The Machine', bot: true }];
+  nextHandoff();
+};
+
+/* ---- handoff ---- */
+function nextHandoff(){
+  $('handoffName').textContent = players[turnOrder[turnPtr]];
+  show('handoff');
+}
+function lastWordOf(text){
+  const w = text.trim().split(/\s+/);
+  return w[w.length-1] || '???';
+}
+$('readyBtn').onclick = () => {
+  const last = story[story.length-1];
+  if(last.bot){
+    // bot lines get shown in FULL (the machine is generous)
+    $('prevLabel').textContent = 'the story so far (the machine shows u everything!!):';
+    $('prevLine').innerHTML = `“ ${escapeHtml(last.text)} ”<div class="prev-author">— ${escapeHtml(last.author)}</div>`;
+  } else {
+    $('prevLabel').textContent = 'the ONLY word u get from the last sentence (good luck!!):';
+    $('prevLine').innerHTML = `“ ...${escapeHtml(lastWordOf(last.text))} ”<div class="prev-author">— the last word written by ${escapeHtml(last.author)}. thats all u get.</div>`;
+  }
+  $('turnTag').innerHTML = `sentence <b>${turnPtr+1}</b> of <b>${turnOrder.length}</b> — ur up, <b>${escapeHtml(players[turnOrder[turnPtr]])}</b>!!`;
+  $('sentenceBox').value = ''; cleanValue = '';
+  $('charCount').textContent = '0';
+  $('alarm').classList.remove('show');
+  show('write');
+  $('sentenceBox').focus();
+  startTimer();
+};
+
+/* ---- 60 second doom clock ---- */
+const TURN_SECONDS = 60;
+let timerId = null, timeLeft = TURN_SECONDS;
+function startTimer(){
+  stopTimer();
+  timeLeft = TURN_SECONDS;
+  renderTimer();
+  timerId = setInterval(() => {
+    timeLeft--;
+    renderTimer();
+    if(timeLeft <= 0){ stopTimer(); timeUp(); }
+  }, 1000);
+}
+function stopTimer(){
+  if(timerId){ clearInterval(timerId); timerId = null; }
+}
+function renderTimer(){
+  $('timer').textContent = String(Math.max(0,timeLeft)).padStart(2,'0');
+  $('timer').parentElement.classList.toggle('panic', timeLeft <= 10);
+}
+function timeUp(){
+  const t = box.value.trim();
+  const who = players[turnOrder[turnPtr]];
+  if(t && !isDirty(t)){
+    // submit whatever they had, ready or not
+    story.push({ text: t + ' (⏰ time ran out mid-thought)', author: who });
+  } else {
+    const filler = TIMEOUT_FILLERS[Math.floor(Math.random()*TIMEOUT_FILLERS.length)];
+    story.push({ text: `${who} ${filler}`, author: '⏰ The Clock', bot: true });
+  }
+  turnPtr++;
+  if(turnPtr >= turnOrder.length) doReveal();
+  else nextHandoff();
+}
+
+/* ---- write + live filter ---- */
+const box = $('sentenceBox');
+function fireAlarm(){
+  const a = $('alarm');
+  a.textContent = ALARM_MSGS[alarmIdx++ % ALARM_MSGS.length];
+  a.classList.remove('show'); void a.offsetWidth; a.classList.add('show');
+  box.classList.remove('blocked'); void box.offsetWidth; box.classList.add('blocked');
+}
+box.addEventListener('input', () => {
+  if(isDirty(box.value)){
+    const pos = Math.max(0, cleanValue.length);
+    box.value = cleanValue;
+    box.setSelectionRange(pos,pos);
+    fireAlarm();
+  } else {
+    cleanValue = box.value;
+  }
+  $('charCount').textContent = box.value.length;
+});
+box.addEventListener('paste', e => {
+  const t = (e.clipboardData||window.clipboardData).getData('text');
+  if(isDirty(t)){ e.preventDefault(); fireAlarm(); }
+});
+box.addEventListener('keydown', e => {
+  if(e.key==='Enter'){ e.preventDefault(); $('submitBtn').click(); }
+});
+
+$('submitBtn').onclick = () => {
+  const t = box.value.trim();
+  if(!t) return;
+  if(isDirty(t)){ fireAlarm(); return; }
+  stopTimer();
+  story.push({ text:t, author: players[turnOrder[turnPtr]] });
+  turnPtr++;
+  if(turnPtr >= turnOrder.length) doReveal();
+  else nextHandoff();
+};
+
+/* ---- reveal ---- */
+function doReveal(){
+  show('reveal');
+  const sb = $('storyBox');
+  sb.innerHTML = story.map(l =>
+    `<div class="story-line"><span class="by">${escapeHtml(l.author)}</span><br>${escapeHtml(l.text)}</div>`).join('');
+  $('theEnd').classList.remove('in');
+  $('againBtn').classList.add('hidden');
+  const lines = sb.querySelectorAll('.story-line');
+  lines.forEach((el,i) => setTimeout(() => {
+    el.classList.add('in');
+    if(i === lines.length-1){
+      setTimeout(() => {
+        $('theEnd').classList.add('in');
+        $('againBtn').classList.remove('hidden');
+        confetti();
+      }, 600);
+    }
+  }, 900*i + 300));
+}
+$('againBtn').onclick = () => { show('setup'); renderChips(); };
+
+function confetti(){
+  const bits = ['🎉','📖','✨','🐍','🎊','🤪','💾','📼'];
+  for(let i=0;i<40;i++){
+    const s = document.createElement('span');
+    s.className='confetti';
+    s.textContent = bits[Math.floor(Math.random()*bits.length)];
+    s.style.left = Math.random()*100+'vw';
+    s.style.animationDuration = (2+Math.random()*3)+'s';
+    s.style.animationDelay = Math.random()*1.5+'s';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 6000);
+  }
+}
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---- PWA: service worker (only works over http/https, not file://) ---- */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+</html>

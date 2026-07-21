@@ -1,0 +1,15 @@
+{
+  "name": "The Nonsense Machine",
+  "short_name": "Nonsense",
+  "description": "The #1 story game on the information superhighway. No bad words allowed (we have technology).",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#ff00ff",
+  "theme_color": "#00ff00",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
