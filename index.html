@@ -182,6 +182,78 @@
     font-size:16px; letter-spacing:3px; border:2px inset #808080; padding:1px 6px;
   }
   .webring{color:#00ffff; text-decoration:underline; cursor:pointer;}
+
+  .ver-tag{margin-top:10px; font-size:13px; font-weight:bold; color:#0000ff;}
+
+  /* ============ MODERN THEME (a.k.a. boring mode) ============ */
+  body.modern{
+    background:#eef1f6; font-family:"Segoe UI", system-ui, sans-serif; cursor:default;
+  }
+  body.modern marquee, body.modern .construction, body.modern .new-badge{display:none;}
+  body.modern .card{
+    background:#fff; border:1px solid #e2e6ee; border-radius:18px;
+    box-shadow:0 10px 30px rgba(20,30,60,.08); padding:36px;
+  }
+  body.modern h1{
+    font-family:inherit; color:#1c2340; text-shadow:none; -webkit-text-stroke:0;
+    transform:none; font-size:40px; font-weight:800; letter-spacing:-1px;
+  }
+  body.modern .tagline{animation:none; color:#6b7280; font-weight:500; font-size:16px;}
+  body.modern .big-emoji{animation:none; font-size:52px;}
+  body.modern .section-label{
+    color:#6366f1; text-decoration:none; text-transform:uppercase;
+    font-size:12px; letter-spacing:1.5px;
+  }
+  body.modern .chip{background:#eef2ff; border:1px solid #c7d2fe; border-radius:999px; color:#312e81;}
+  body.modern .chip button{background:none; border:none; color:#ef4444;}
+  body.modern input[type=text], body.modern textarea{
+    border:1.5px solid #d1d5db; border-radius:12px; background:#fff; font-family:inherit;
+  }
+  body.modern input[type=text]:focus, body.modern textarea:focus{border-color:#6366f1;}
+  body.modern .btn{
+    border:none; border-radius:12px; background:#e5e7eb; color:#111827;
+    font-family:inherit; font-weight:600;
+  }
+  body.modern .btn:hover{background:#d1d5db;}
+  body.modern .btn:active{transform:scale(.98); border:none;}
+  body.modern .btn:disabled{background:#e5e7eb; color:#9ca3af;}
+  body.modern .btn-main{background:#6366f1; color:#fff; text-shadow:none;}
+  body.modern .btn-main:hover{background:#4f46e5;}
+  body.modern .rounds .btn-sub.on{background:#6366f1; color:#fff; border:none;}
+  body.modern .handoff .who{
+    font-family:inherit; color:#6366f1; text-shadow:none; text-decoration:none; font-weight:800;
+  }
+  body.modern .secret{animation:none; color:#ef4444; font-size:18px;}
+  body.modern .prev-line{
+    border:1px solid #e5e7eb; border-left:4px solid #6366f1;
+    border-radius:12px; background:#f9fafb;
+  }
+  body.modern .prev-author{color:#9ca3af;}
+  body.modern .timer-box{background:#1c2340; border:none; border-radius:12px; color:#94a3b8;}
+  body.modern .timer{border:none; color:#38bdf8; background:transparent;}
+  body.modern .timer-box.panic{background:#7f1d1d; border:none;}
+  body.modern .timer-box.panic .timer{color:#fca5a5;}
+  body.modern .alarm{
+    background:#fef2f2; border:1.5px solid #ef4444; border-radius:12px;
+    color:#b91c1c; text-shadow:none; text-transform:none;
+  }
+  body.modern textarea.blocked{background:#fef2f2; border-color:#ef4444;}
+  body.modern .story-line{background:#fff; border:1px solid #e5e7eb; border-radius:12px;}
+  body.modern .story-line:nth-child(4n+1){border-left:4px solid #6366f1;}
+  body.modern .story-line:nth-child(4n+2){border-left:4px solid #ec4899;}
+  body.modern .story-line:nth-child(4n+3){border-left:4px solid #10b981;}
+  body.modern .story-line:nth-child(4n+4){border-left:4px solid #f59e0b;}
+  body.modern .story-line .by{background:#6366f1; border-radius:6px;}
+  body.modern .the-end, body.modern h2{
+    font-family:inherit; color:#1c2340; text-shadow:none; font-weight:800;
+  }
+  body.modern .footer{
+    background:#f9fafb; color:#6b7280; border:1px solid #e5e7eb;
+    border-radius:12px; font-weight:500;
+  }
+  body.modern .footer .counter{color:#6366f1; border:none; background:#eef2ff; border-radius:6px;}
+  body.modern .webring{color:#6366f1;}
+  body.modern .ver-tag{color:#9ca3af;}
 </style>
 </head>
 <body>
@@ -211,6 +283,13 @@
     </div>
 
     <button class="btn btn-main" id="startBtn" disabled>need at least 2 players...</button>
+
+    <div class="section-label">⚙ settings</div>
+    <div class="rounds" id="themeBtns">
+      <button class="btn btn-sub theme-btn on" data-theme="retro">🤪 1998 mode</button>
+      <button class="btn btn-sub theme-btn" data-theme="modern">😐 boring modern mode</button>
+    </div>
+    <div class="ver-tag">version: <span id="verTag">?</span></div>
 
     <div class="footer">
       You are visitor number <span class="counter" id="hitCounter">0000000</span> !!!<br>
@@ -385,6 +464,21 @@ let cleanValue = "";
 const $ = id => document.getElementById(id);
 const screens = ['setup','handoff','write','reveal'];
 function show(id){ screens.forEach(s => $(s).classList.toggle('hidden', s!==id)); }
+
+/* ---- version (keep in sync with the CACHE name in sw.js) ---- */
+const APP_VERSION = 'v4';
+$('verTag').textContent = APP_VERSION;
+
+/* ---- theme picker ---- */
+function applyTheme(t){
+  document.body.classList.toggle('modern', t === 'modern');
+  localStorage.setItem('nonsenseTheme', t);
+  document.querySelectorAll('.theme-btn').forEach(b =>
+    b.classList.toggle('on', b.dataset.theme === t));
+}
+document.querySelectorAll('.theme-btn').forEach(b =>
+  b.onclick = () => applyTheme(b.dataset.theme));
+applyTheme(localStorage.getItem('nonsenseTheme') || 'retro');
 
 /* ---- fake hit counter ---- */
 (function(){
