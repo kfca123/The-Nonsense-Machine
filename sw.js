@@ -1,6 +1,6 @@
 // bump this version string whenever any file changes, or users keep the old cached version
 // (also bump APP_VERSION in index.html so the settings section shows the same number)
-const CACHE = 'nonsense-v9';
+const CACHE = 'nonsense-v10';
 const FILES = [
   './',
   './index.html',
