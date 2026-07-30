@@ -227,6 +227,35 @@
   .share-row input{font-size:12px; padding:8px 10px;}
   .share-row .btn{white-space:nowrap;}
 
+  /* ---- drawing pad ---- */
+  .pad-wrap{text-align:center; margin:10px 0;}
+  #pad{
+    background:#fff; border:5px inset #808080; cursor:crosshair;
+    touch-action:none;              /* stop phones scrolling while u draw */
+    width:400px; max-width:100%; height:auto; aspect-ratio:4/3;
+  }
+  .draw-tools{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center;
+    margin-top:8px;
+  }
+  .swatches, .sizes{display:flex; gap:5px;}
+  .swatch{
+    width:34px; height:34px; border:4px outset #c0c0c0; cursor:pointer; padding:0;
+  }
+  .swatch.on{border-style:inset; transform:scale(.92);}
+  .size-btn{
+    width:38px; height:34px; border:4px outset #c0c0c0; background:#c0c0c0;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
+  }
+  .size-btn.on{border-style:inset; background:#00ff00;}
+  .size-btn span{background:#000; border-radius:50%; display:block;}
+  .draw-tools .btn{padding:8px 12px; font-size:14px;}
+  .story-img{
+    max-width:100%; width:340px; border:3px solid #000; background:#fff;
+    display:block; margin-top:4px;
+  }
+  .prev-line .story-img{width:300px;}
+
   /* ---- multi story reveal ---- */
   .story-title{
     font-family:var(--chunky); font-size:26px; text-align:center;
@@ -274,6 +303,11 @@
     .room-code{font-size:38px; letter-spacing:8px; padding-left:8px;}
     .qr-box svg{width:140px; height:140px;}
     .story-title{font-size:20px;}
+    .swatch{width:30px; height:30px; border-width:3px;}
+    .size-btn{width:34px; height:30px; border-width:3px;}
+    .draw-tools{gap:6px;}
+    .draw-tools .btn{padding:8px 10px; font-size:13px;}
+    .story-img, .prev-line .story-img{width:100%;}
     .footer{font-size:12px; line-height:1.6;}
   }
 
@@ -363,6 +397,13 @@
     font-family:inherit; color:#1c2340; text-shadow:none; -webkit-text-stroke:0;
     font-weight:800; font-size:22px;
   }
+  body.modern #pad{border:1.5px solid #d1d5db; border-radius:12px;}
+  body.modern .swatch, body.modern .size-btn{border:2px solid #d1d5db; border-radius:8px;}
+  body.modern .swatch.on{border-color:#6366f1; border-width:3px;}
+  body.modern .size-btn.on{background:#6366f1;}
+  body.modern .size-btn.on span{background:#fff;}
+  body.modern .story-img{border:1px solid #e5e7eb; border-radius:10px;}
+  body.modern .kind-btn.on{background:#6366f1; color:#fff;}
 </style>
 </head>
 <body>
@@ -396,6 +437,12 @@
         <button class="btn btn-sub" data-r="1">1</button>
         <button class="btn btn-sub on" data-r="2">2</button>
         <button class="btn btn-sub" data-r="3">3</button>
+      </div>
+
+      <div class="section-label">what kind of chaos???</div>
+      <div class="mode-btns">
+        <button class="btn btn-sub kind-btn on" data-draw="0">✍️ WRITING ONLY</button>
+        <button class="btn btn-sub kind-btn" data-draw="1">✍️🎨 WRITING + DOODLES</button>
       </div>
 
       <button class="btn btn-main" id="startBtn" disabled>need at least 2 players...</button>
@@ -458,11 +505,19 @@
     <div class="lobby-list" id="lobbyList"></div>
 
     <div id="hostControls">
-      <div class="section-label">How many sentences each???</div>
+      <div class="section-label">what kind of chaos???</div>
+      <div class="mode-btns">
+        <button class="btn btn-sub kind-btn on" data-draw="0">✍️ WRITING ONLY</button>
+        <button class="btn btn-sub kind-btn" data-draw="1">✍️🎨 WRITING + DOODLES</button>
+      </div>
+
+      <div class="section-label">How many turns each???</div>
       <div class="rounds" id="roundBtnsNet">
         <button class="btn btn-sub" data-r="1">1</button>
         <button class="btn btn-sub on" data-r="2">2</button>
         <button class="btn btn-sub" data-r="3">3</button>
+        <button class="btn btn-sub" data-r="4">4</button>
+        <button class="btn btn-sub" data-r="5">5</button>
       </div>
       <button class="btn btn-main" id="netStartBtn" disabled>need 2+ players...</button>
     </div>
@@ -470,6 +525,22 @@
 
     <div class="net-status hidden" id="lobbyStatus"></div>
     <button class="btn btn-sub" id="leaveBtn" style="width:100%; margin-top:18px;">🚪 leave room</button>
+  </div>
+
+  <!-- DRAW -->
+  <div class="card hidden" id="draw">
+    <div class="timer-box">⏰ TIME LEFT: <span class="timer" id="drawTimer">60</span> ⏰</div>
+    <div class="turn-tag" id="drawTag"></div>
+    <div class="section-label">🎨 draw this (no words allowed!!):</div>
+    <div class="prev-line" id="drawPrompt"></div>
+    <div class="pad-wrap"><canvas id="pad" width="400" height="300"></canvas></div>
+    <div class="draw-tools">
+      <div class="swatches" id="swatches"></div>
+      <div class="sizes" id="sizes"></div>
+      <button class="btn btn-sub" id="undoBtn">↩ UNDO</button>
+      <button class="btn btn-sub" id="clearBtn">🗑 CLEAR</button>
+    </div>
+    <button class="btn btn-main" id="drawDone">IM DONE 🔒</button>
   </div>
 
   <!-- WAITING (online, not ur turn) -->
@@ -647,11 +718,11 @@ let story = [];         // {text, author}
 let cleanValue = "";
 
 const $ = id => document.getElementById(id);
-const screens = ['setup','online','lobby','handoff','write','waiting','reveal'];
+const screens = ['setup','online','lobby','handoff','write','draw','waiting','reveal'];
 function show(id){ screens.forEach(s => $(s).classList.toggle('hidden', s!==id)); }
 
 /* ---- version (keep in sync with the CACHE name in sw.js) ---- */
-const APP_VERSION = 'v8';
+const APP_VERSION = 'v9';
 $('verTag').textContent = APP_VERSION;
 
 /* ---- theme picker ---- */
@@ -724,7 +795,7 @@ function beginGame(){
   turnOrder = [];
   for(let r=0; r<roundsEach; r++) for(let i=0; i<players.length; i++) turnOrder.push(i);
   turnPtr = 0;
-  story = [{ text: nextPrompt(), author: '🤖 The Machine', bot: true }];
+  story = [{ kind:'text', text: nextPrompt(), author: '🤖 The Machine', bot: true }];
   gameRunning = true;
   advanceTurn();
 }
@@ -733,41 +804,65 @@ function lastWordOf(text){
   const w = text.trim().split(/\s+/);
   return w[w.length-1] || '???';
 }
-// what the next writer is allowed to see: bot lines in full, human lines = last word only
-function prevViewOf(st){
-  const last = st[st.length-1];
-  return last.bot
-    ? { bot:true,  text:last.text,             author:last.author }
-    : { bot:false, text:lastWordOf(last.text), author:last.author };
+
+/* ---- doodle mode ----
+   Stories alternate: bot prompt → someone DRAWS it → someone else writes what
+   they think the drawing is → someone draws THAT → ... (telephone, basically).
+   The drawing is its own obfuscation, so a drawer gets the whole sentence,
+   while a writer still only gets the last word. */
+let drawMode = false;
+function kindForRound(r){ return (drawMode && r % 2 === 0) ? 'draw' : 'text'; }
+function kindForLocal(){ return (drawMode && story.length % 2 === 1) ? 'draw' : 'text'; }
+
+// only PNG data urls we produced ourselves are allowed anywhere near innerHTML
+function safeImg(d){
+  return (typeof d === 'string' && d.length < 400000 &&
+          /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(d)) ? d : '';
 }
 
-function pushLine(st, who, text, timedOut){
-  const t = (text||'').trim();
-  if(t && !isDirty(t)){
-    st.push({ text: t + (timedOut ? ' (⏰ time ran out mid-thought)' : ''), author: who });
-  } else {
+// what the next person is allowed to see
+function prevViewFor(st, nextKind){
+  const last = st[st.length-1];
+  if(last.kind === 'draw') return { kind:'draw', img:last.img, author:last.author };
+  if(nextKind === 'draw' || last.bot)
+    return { kind:'text', full:true,  text:last.text,             author:last.author };
+  return   { kind:'text', full:false, text:lastWordOf(last.text), author:last.author };
+}
+
+function pushLine(st, who, payload, timedOut){
+  const clockLine = () => {
     const filler = TIMEOUT_FILLERS[Math.floor(Math.random()*TIMEOUT_FILLERS.length)];
-    st.push({ text: `${who} ${filler}`, author: '⏰ The Clock', bot: true });
+    st.push({ kind:'text', text:`${who} ${filler}`, author:'⏰ The Clock', bot:true });
+  };
+  if(payload && payload.kind === 'draw'){
+    const img = safeImg(payload.img);
+    if(img) st.push({ kind:'draw', img, author: who });
+    else clockLine();                       // blank canvas = no drawing
+    return;
+  }
+  const t = String((payload && payload.text) || '').trim().slice(0,140);
+  if(t && !isDirty(t)){
+    st.push({ kind:'text', text: t + (timedOut ? ' (⏰ time ran out mid-thought)' : ''), author: who });
+  } else {
+    clockLine();
   }
 }
 
 /* ---------- local (pass the computer) ---------- */
 function advanceTurn(){
   if(turnPtr >= turnOrder.length){ finishGame(); return; }
+  const kind = kindForLocal();
   pendingTurn = {
-    name: players[turnOrder[turnPtr]],
-    turnNum: turnPtr+1, total: turnOrder.length, prev: prevViewOf(story)
+    name: players[turnOrder[turnPtr]], kind,
+    turnNum: turnPtr+1, total: turnOrder.length, prev: prevViewFor(story, kind)
   };
   $('handoffName').textContent = pendingTurn.name;
   show('handoff');
 }
-$('readyBtn').onclick = () => { if(pendingTurn) openWriteScreen(pendingTurn); };
-
-function applySentence(who, text, timedOut){
-  pushLine(story, who, text, timedOut);
-  turnPtr++;
-  advanceTurn();
-}
+$('readyBtn').onclick = () => {
+  if(!pendingTurn) return;
+  pendingTurn.kind === 'draw' ? openDrawScreen(pendingTurn) : openWriteScreen(pendingTurn);
+};
 function finishGame(){
   gameRunning = false;
   doReveal();
@@ -776,7 +871,7 @@ function finishGame(){
 /* ---------- online (everyone at once) ---------- */
 function beginParallel(){
   parallel = true; gameRunning = true;
-  stories = players.map(() => [{ text: nextPrompt(), author: '🤖 The Machine', bot: true }]);
+  stories = players.map(() => [{ kind:'text', text: nextPrompt(), author: '🤖 The Machine', bot: true }]);
   roundNum = 0;
   startRound();
 }
@@ -786,19 +881,20 @@ function assignmentFor(playerIdx){ return (playerIdx + roundNum) % players.lengt
 
 function startRound(){
   submittedThisRound = {};
+  const kind = kindForRound(roundNum);
   players.forEach((name, i) => {
     const sIdx = assignmentFor(i);
     if(gone.has(name)){                       // their device is dead — Clock writes for them
       submittedThisRound[name] = true;
-      pushLine(stories[sIdx], name, '', true);
+      pushLine(stories[sIdx], name, null, true);
       return;
     }
     const info = {
-      t:'turn', parallel:true, storyIdx:sIdx, name,
+      t:'turn', parallel:true, kind, storyIdx:sIdx, name,
       roundNum: roundNum+1, totalRounds: roundsEach,
-      prev: prevViewOf(stories[sIdx])
+      prev: prevViewFor(stories[sIdx], kind)
     };
-    if(name === myName) openWriteScreen(info);
+    if(name === myName) (kind === 'draw' ? openDrawScreen(info) : openWriteScreen(info));
     else sendTo(name, info);
   });
   if(Object.keys(submittedThisRound).length >= players.length){ endRound(); return; }
@@ -806,13 +902,13 @@ function startRound(){
   pushProgress();
 }
 
-function hostTakeSentence(name, text, timedOut){
+function hostTakeSentence(name, payload, timedOut){
   if(!gameRunning || !parallel) return;
   if(submittedThisRound[name]) return;         // already in for this round
   const i = players.indexOf(name);
   if(i < 0) return;
   submittedThisRound[name] = true;
-  pushLine(stories[assignmentFor(i)], name, text, timedOut);
+  pushLine(stories[assignmentFor(i)], name, payload, timedOut);
   pushProgress();
   if(Object.keys(submittedThisRound).length >= players.length) endRound();
 }
@@ -840,7 +936,7 @@ function armRoundSafety(){
       if(submittedThisRound[name]) return;
       submittedThisRound[name] = true;
       gone.add(name);                          // didn't report in — skip them fast next round
-      pushLine(stories[assignmentFor(i)], name, '', true);
+      pushLine(stories[assignmentFor(i)], name, null, true);
     });
     endRound();
   }, (TURN_SECONDS + 4) * 1000);
@@ -859,23 +955,33 @@ function showProgress(done, total){
 }
 
 /* ---------- shared screens ---------- */
+let myStoryIdx = -1;
+function applyTurnMeta(info){
+  if(info.parallel){ roundNum = info.roundNum - 1; myStoryIdx = info.storyIdx; }
+}
+function turnHeadline(info, verb){
+  return info.parallel
+    ? `${verb} <b>STORY #${info.storyIdx+1}</b> — round <b>${info.roundNum}</b> of <b>${info.totalRounds}</b> — EVERYONE goes at once!!`
+    : `turn <b>${info.turnNum}</b> of <b>${info.total}</b> — ur up, <b>${escapeHtml(info.name)}</b>!!`;
+}
+
 function openWriteScreen(info){
   iSubmitted = false;
+  applyTurnMeta(info);
   const p = info.prev;
-  if(p.bot){
+  if(p.kind === 'draw'){
+    $('prevLabel').textContent = 'what on earth is this?? write what u think its meant to be:';
+    $('prevLine').innerHTML =
+      `<img class="story-img" src="${safeImg(p.img)}" alt="somebodys drawing">` +
+      `<div class="prev-author">— drawn by ${escapeHtml(p.author)}. good luck.</div>`;
+  } else if(p.full){
     $('prevLabel').textContent = 'the story so far (the machine shows u everything!!):';
     $('prevLine').innerHTML = `“ ${escapeHtml(p.text)} ”<div class="prev-author">— ${escapeHtml(p.author)}</div>`;
   } else {
     $('prevLabel').textContent = 'the ONLY word u get from the last sentence (good luck!!):';
     $('prevLine').innerHTML = `“ ...${escapeHtml(p.text)} ”<div class="prev-author">— the last word written by ${escapeHtml(p.author)}. thats all u get.</div>`;
   }
-  if(info.parallel){
-    roundNum = info.roundNum - 1;
-    myStoryIdx = info.storyIdx;
-    $('turnTag').innerHTML = `📖 ur writing on <b>STORY #${info.storyIdx+1}</b> — round <b>${info.roundNum}</b> of <b>${info.totalRounds}</b> — EVERYONE writes at once!!`;
-  } else {
-    $('turnTag').innerHTML = `sentence <b>${info.turnNum}</b> of <b>${info.total}</b> — ur up, <b>${escapeHtml(info.name)}</b>!!`;
-  }
+  $('turnTag').innerHTML = turnHeadline(info, p.kind === 'draw' ? '🔍 ur guessing on' : '📖 ur writing on');
   box.value = ''; cleanValue = '';
   $('charCount').textContent = '0';
   $('alarm').classList.remove('show');
@@ -883,7 +989,17 @@ function openWriteScreen(info){
   box.focus();
   startTimer(TURN_SECONDS, myTimeUp);
 }
-let myStoryIdx = -1;
+
+function openDrawScreen(info){
+  iSubmitted = false;
+  applyTurnMeta(info);
+  clearPad();
+  const p = info.prev;
+  $('drawPrompt').innerHTML = `“ ${escapeHtml(p.text)} ”<div class="prev-author">— ${escapeHtml(p.author)}</div>`;
+  $('drawTag').innerHTML = turnHeadline(info, '🎨 ur drawing for');
+  show('draw');
+  startTimer(TURN_SECONDS, myDrawTimeUp);
+}
 
 function showLockedIn(){
   $('waitTimerLabel').textContent = '⏰ ROUND ENDS IN:';
@@ -893,23 +1009,25 @@ function showLockedIn(){
   show('waiting');
 }
 
-/* ---- submitting ---- */
-function submitSentence(text, timedOut){
+/* ---- submitting (one path for both sentences and doodles) ---- */
+function submitEntry(payload, timedOut){
   if(iSubmitted) return;
   iSubmitted = true;
 
   if(netMode === 'guest'){
-    send(hostConn, { t:'sentence', text, timedOut, round: roundNum });
+    send(hostConn, { t:'entry', payload, timedOut, round: roundNum });
     showLockedIn();
     return;
   }
   if(netMode === 'host' && parallel){
     showLockedIn();                    // may be replaced instantly if the round ends
-    hostTakeSentence(myName, text, timedOut);
+    hostTakeSentence(myName, payload, timedOut);
     return;
   }
-  stopTimer();
-  applySentence(players[turnOrder[turnPtr]], text, timedOut);
+  stopTimer();                         // local
+  pushLine(story, players[turnOrder[turnPtr]], payload, timedOut);
+  turnPtr++;
+  advanceTurn();
 }
 
 /* ---- 60 second doom clock ---- */
@@ -932,13 +1050,14 @@ function stopTimer(){
 // so after you lock in you can still watch the round clock tick down
 function renderTimer(){
   const v = String(Math.max(0,timeLeft)).padStart(2,'0');
-  ['timer','waitTimer'].forEach(id => {
+  ['timer','drawTimer','waitTimer'].forEach(id => {
     const el = $(id); if(!el) return;
     el.textContent = v;
     el.parentElement.classList.toggle('panic', timeLeft <= 10);
   });
 }
-function myTimeUp(){ if(!iSubmitted) submitSentence(box.value.trim(), true); }
+function myTimeUp(){     if(!iSubmitted) submitEntry({ kind:'text', text: box.value.trim() }, true); }
+function myDrawTimeUp(){ if(!iSubmitted) submitEntry({ kind:'draw', img: padImage() }, true); }
 
 /* ---- write + live filter ---- */
 const box = $('sentenceBox');
@@ -971,8 +1090,68 @@ $('submitBtn').onclick = () => {
   const t = box.value.trim();
   if(!t) return;
   if(isDirty(t)){ fireAlarm(); return; }
-  submitSentence(t, false);
+  submitEntry({ kind:'text', text:t }, false);
 };
+
+/* ================= THE DOODLE PAD ================= */
+const pad = $('pad'), pctx = pad.getContext('2d');
+const PEN_COLORS = ['#000000','#ff0000','#ff8800','#ffdd00','#00cc33','#0066ff','#aa00ff','#ff66cc','#8b4513','#ffffff'];
+const PEN_SIZES  = [3, 7, 16];
+let strokes = [], curStroke = null, penColor = '#000000', penSize = 7;
+
+$('swatches').innerHTML = PEN_COLORS.map((c,i) =>
+  `<button class="swatch${i===0?' on':''}" data-c="${c}" style="background:${c}"></button>`).join('');
+$('swatches').querySelectorAll('.swatch').forEach(b => b.onclick = () => {
+  penColor = b.dataset.c;
+  $('swatches').querySelectorAll('.swatch').forEach(x => x.classList.toggle('on', x===b));
+});
+$('sizes').innerHTML = PEN_SIZES.map((s,i) =>
+  `<button class="size-btn${i===1?' on':''}" data-s="${s}"><span style="width:${s+2}px;height:${s+2}px"></span></button>`).join('');
+$('sizes').querySelectorAll('.size-btn').forEach(b => b.onclick = () => {
+  penSize = +b.dataset.s;
+  $('sizes').querySelectorAll('.size-btn').forEach(x => x.classList.toggle('on', x===b));
+});
+
+function padPos(e){
+  const r = pad.getBoundingClientRect();
+  return { x:(e.clientX - r.left) * (pad.width / r.width),
+           y:(e.clientY - r.top ) * (pad.height / r.height) };
+}
+function repaint(){
+  pctx.fillStyle = '#fff';
+  pctx.fillRect(0,0,pad.width,pad.height);
+  pctx.lineCap = 'round'; pctx.lineJoin = 'round';
+  strokes.forEach(s => {
+    pctx.strokeStyle = s.c; pctx.lineWidth = s.w;
+    pctx.beginPath();
+    s.pts.forEach((p,i) => i ? pctx.lineTo(p.x,p.y) : pctx.moveTo(p.x,p.y));
+    if(s.pts.length === 1) pctx.lineTo(s.pts[0].x + 0.5, s.pts[0].y);   // a single tap = a dot
+    pctx.stroke();
+  });
+}
+function clearPad(){ strokes = []; curStroke = null; repaint(); }
+function padImage(){ return strokes.length ? pad.toDataURL('image/png') : ''; }
+
+pad.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  try{ pad.setPointerCapture(e.pointerId); }catch(_){}
+  curStroke = { c:penColor, w:penSize, pts:[padPos(e)] };
+  strokes.push(curStroke);
+  repaint();
+});
+pad.addEventListener('pointermove', e => {
+  if(!curStroke) return;
+  e.preventDefault();
+  curStroke.pts.push(padPos(e));
+  repaint();
+});
+['pointerup','pointercancel','pointerleave'].forEach(ev =>
+  pad.addEventListener(ev, () => { curStroke = null; }));
+
+$('undoBtn').onclick  = () => { strokes.pop(); repaint(); };
+$('clearBtn').onclick = () => clearPad();
+$('drawDone').onclick = () => submitEntry({ kind:'draw', img: padImage() }, false);
+repaint();
 
 /* ---- reveal ---- */
 function doReveal(){
@@ -987,7 +1166,10 @@ function doReveal(){
   const sb = $('storyBox');
   sb.innerHTML = blocks.map((st, bi) =>
     (blocks.length > 1 ? `<div class="story-title reveal-item">📖 STORY #${bi+1}</div>` : '') +
-    st.map(l => `<div class="story-line reveal-item"><span class="by">${escapeHtml(l.author)}</span><br>${escapeHtml(l.text)}</div>`).join('')
+    st.map(l => `<div class="story-line reveal-item"><span class="by">${escapeHtml(l.author)}</span><br>` +
+      (l.kind === 'draw'
+        ? `<img class="story-img" src="${safeImg(l.img)}" alt="a drawing">`
+        : escapeHtml(l.text)) + `</div>`).join('')
   ).join('');
   $('theEnd').classList.remove('in');
   $('againBtn').classList.add('hidden');
@@ -1103,7 +1285,7 @@ function hostAddConn(conn){
     if(gameRunning){
       gone.add(nm);                       // their remaining turns go to The Clock
       // don't make the whole room wait out the clock for someone who left
-      if(parallel) hostTakeSentence(nm, '', true);
+      if(parallel) hostTakeSentence(nm, null, true);
     } else {
       players = players.filter(p => p !== nm);
       broadcast({ t:'roster', players });
@@ -1118,6 +1300,9 @@ function hostOnData(conn, m){
 
   if(m.t === 'hello'){
     const nm = String(m.name||'').trim().slice(0,16);
+    if(m.v !== APP_VERSION)     return send(conn, { t:'kick', reason:
+      'ur game is ' + (m.v||'ancient') + ' but this room is ' + APP_VERSION +
+      ' — refresh ur page TWICE to update, then rejoin' });
     if(!nm || isDirty(nm))      return send(conn, { t:'kick', reason:'that name isnt allowed' });
     if(gameRunning)             return send(conn, { t:'kick', reason:'that game already started! wait for the next round' });
     if(players.includes(nm))    return send(conn, { t:'kick', reason:'someone in there is already called ' + nm });
@@ -1131,10 +1316,10 @@ function hostOnData(conn, m){
     return;
   }
 
-  if(m.t === 'sentence'){
+  if(m.t === 'entry'){
     if(!gameRunning) return;
     if(typeof m.round === 'number' && m.round !== roundNum) return;   // stale, from a finished round
-    hostTakeSentence(conn.playerName, String(m.text||'').slice(0,140), !!m.timedOut);
+    hostTakeSentence(conn.playerName, m.payload, !!m.timedOut);
   }
 }
 
@@ -1149,7 +1334,7 @@ function joinRoom(){
 
   peer.on('open', () => {
     hostConn = peer.connect(PEER_PREFIX + code, { reliable: true });
-    hostConn.on('open', () => { send(hostConn, { t:'hello', name: myName }); });
+    hostConn.on('open', () => { send(hostConn, { t:'hello', name: myName, v: APP_VERSION }); });
     hostConn.on('data', m => guestOnData(m));
     hostConn.on('close', () => {
       if(netMode !== 'guest') return;
@@ -1200,7 +1385,7 @@ function guestOnData(m){
     case 'turn':
       gameRunning = true;
       parallel = !!m.parallel;
-      openWriteScreen(m);
+      if(m.kind === 'draw') openDrawScreen(m); else openWriteScreen(m);
       break;
     case 'progress':
       showProgress(m.done, m.total);
@@ -1321,6 +1506,15 @@ $('roundBtnsNet').querySelectorAll('.btn').forEach(b => b.onclick = () => {
   roundsEach = +b.dataset.r;
   $('roundBtnsNet').querySelectorAll('.btn').forEach(x => x.classList.toggle('on', x===b));
 });
+
+// doodle toggle — mirrored on the setup screen and in the lobby
+function applyDrawMode(on){
+  drawMode = !!on;
+  document.querySelectorAll('.kind-btn').forEach(b =>
+    b.classList.toggle('on', (b.dataset.draw === '1') === drawMode));
+}
+document.querySelectorAll('.kind-btn').forEach(b =>
+  b.onclick = () => applyDrawMode(b.dataset.draw === '1'));
 
 function confetti(){
   const bits = ['🎉','📖','✨','🐍','🎊','🤪','💾','📼'];
