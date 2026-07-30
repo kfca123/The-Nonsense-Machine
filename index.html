@@ -156,10 +156,8 @@
   /* reveal */
   .story-line{
     background:#fff; border:4px ridge #808080; padding:12px 16px; margin-bottom:10px;
-    font-size:18px; line-height:1.5; opacity:0; transform:translateY(14px);
-    transition:opacity .5s, transform .5s;
+    font-size:18px; line-height:1.5;
   }
-  .story-line.in{opacity:1; transform:translateY(0);}
   .story-line .by{
     color:#fff; background:#0000ff; font-size:12px; font-weight:bold;
     display:inline-block; padding:1px 8px; margin-bottom:5px; text-transform:uppercase;
@@ -217,6 +215,27 @@
   .dots::after{content:'...'; animation:dots 1.2s steps(4) infinite; }
   @keyframes dots{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}}
 
+  /* ---- share / QR ---- */
+  .qr-wrap{text-align:center; margin:12px 0;}
+  .qr-box{
+    background:#fff; padding:8px; border:5px ridge #0000ff;
+    display:inline-block; line-height:0;
+  }
+  .qr-box svg{width:168px; height:168px; display:block;}
+  .qr-hint{font-size:14px; font-weight:bold; margin-top:6px;}
+  .share-row{margin-top:8px;}
+  .share-row input{font-size:12px; padding:8px 10px;}
+  .share-row .btn{white-space:nowrap;}
+
+  /* ---- multi story reveal ---- */
+  .story-title{
+    font-family:var(--chunky); font-size:26px; text-align:center;
+    color:#ff00ff; text-shadow:2px 2px 0 #00ffff, 4px 4px 0 #000;
+    -webkit-text-stroke:1px #000; margin:22px 0 10px; letter-spacing:1px;
+  }
+  .reveal-item{opacity:0; transform:translateY(14px); transition:opacity .5s, transform .5s;}
+  .reveal-item.in{opacity:1; transform:translateY(0);}
+
   /* ============ MOBILE ============ */
   @media (max-width:640px){
     body{background-size:36px 36px; cursor:default;}
@@ -253,6 +272,8 @@
     h2{font-size:24px;}
     .the-end{font-size:28px;}
     .room-code{font-size:38px; letter-spacing:8px; padding-left:8px;}
+    .qr-box svg{width:140px; height:140px;}
+    .story-title{font-size:20px;}
     .footer{font-size:12px; line-height:1.6;}
   }
 
@@ -336,6 +357,12 @@
   body.modern .lobby-list .chip{background:#eef2ff;}
   body.modern .lobby-list .chip.me{background:#dcfce7; border-color:#86efac; color:#166534;}
   body.modern .waiting .who{font-family:inherit; color:#6366f1; text-shadow:none; font-weight:800;}
+  body.modern .qr-box{border:1px solid #e5e7eb; border-radius:14px; padding:12px;}
+  body.modern .qr-hint{color:#6b7280;}
+  body.modern .story-title{
+    font-family:inherit; color:#1c2340; text-shadow:none; -webkit-text-stroke:0;
+    font-weight:800; font-size:22px;
+  }
 </style>
 </head>
 <body>
@@ -418,6 +445,15 @@
     <p style="text-align:center; font-size:14px; font-weight:bold;">tell ur friends to type this in!!</p>
     <div class="room-code" id="roomCode">????</div>
 
+    <div class="qr-wrap" id="shareBox">
+      <div class="qr-box" id="qrBox"></div>
+      <p class="qr-hint">📷 or point ur phone camera at this!!</p>
+      <div class="row share-row">
+        <input type="text" id="shareLink" readonly onclick="this.select()">
+        <button class="btn btn-sub" id="copyLink">COPY 📋</button>
+      </div>
+    </div>
+
     <div class="section-label">whos here (<span id="lobbyCount">0</span>/8):</div>
     <div class="lobby-list" id="lobbyList"></div>
 
@@ -438,11 +474,11 @@
 
   <!-- WAITING (online, not ur turn) -->
   <div class="card waiting hidden" id="waiting">
-    <div class="timer-box">⏰ THEY HAVE: <span class="timer" id="waitTimer">60</span> ⏰</div>
+    <div class="timer-box"><span id="waitTimerLabel">⏰ THEY HAVE:</span> <span class="timer" id="waitTimer">60</span> ⏰</div>
     <span class="big-emoji">✍️</span>
-    <p style="font-size:17px; font-weight:bold;">currently writing:</p>
+    <p style="font-size:17px; font-weight:bold;" id="waitLead">currently writing:</p>
     <div class="who" id="waitingName">???</div>
-    <p style="font-size:15px; font-weight:bold;">sit tight, ur turn is coming<span class="dots"></span></p>
+    <p style="font-size:15px; font-weight:bold;" id="waitSub">sit tight, ur turn is coming<span class="dots"></span></p>
     <div class="net-status" id="waitProgress"></div>
   </div>
 
@@ -471,7 +507,7 @@
 
   <!-- REVEAL -->
   <div class="card hidden" id="reveal">
-    <h2>📜 ~*~ThE mAsTeRpIeCe~*~ 📜</h2>
+    <h2 id="revealTitle">📜 ~*~ThE mAsTeRpIeCe~*~ 📜</h2>
     <div id="storyBox"></div>
     <div class="the-end" id="theEnd">🎬 THE END 🎬</div>
     <button class="btn btn-main hidden" id="againBtn">WRITE ANOTHER ONE!! 🔁</button>
@@ -480,6 +516,7 @@
 </div>
 
 <script src="peerjs.min.js"></script>
+<script src="qrcode.js"></script>
 <script>
 /* ---------------- PROFANITY SHIELD ----------------
    Blocks bad words AS YOU TYPE — including l33t tricks
@@ -614,7 +651,7 @@ const screens = ['setup','online','lobby','handoff','write','waiting','reveal'];
 function show(id){ screens.forEach(s => $(s).classList.toggle('hidden', s!==id)); }
 
 /* ---- version (keep in sync with the CACHE name in sw.js) ---- */
-const APP_VERSION = 'v7';
+const APP_VERSION = 'v8';
 $('verTag').textContent = APP_VERSION;
 
 /* ---- theme picker ---- */
@@ -667,11 +704,23 @@ renderChips();
 
 $('startBtn').onclick = () => { netMode = 'local'; beginGame(); };
 
-/* ================= GAME LOOP (shared by local + online) ================= */
+/* ================= GAME LOOP =================
+   LOCAL  = one story, pass the computer around, one writer at a time.
+   ONLINE = one story PER PLAYER, all running at once. Every round each
+            player writes on a different story, so nobody ever waits for
+            a turn and you end up with a pile of stories instead of one. */
 let gameRunning = false;
 let pendingTurn = null;   // turn info waiting behind the local handoff screen
+let parallel    = false;  // true while an online game is running
+let stories     = [];     // parallel: one story per player
+let roundNum    = 0;
+let submittedThisRound = {};
+let iSubmitted  = false;
 
 function beginGame(){
+  if(netMode === 'host') return beginParallel();
+  // ---- local: single story, sequential ----
+  parallel = false;
   turnOrder = [];
   for(let r=0; r<roundsEach; r++) for(let i=0; i<players.length; i++) turnOrder.push(i);
   turnPtr = 0;
@@ -685,42 +734,133 @@ function lastWordOf(text){
   return w[w.length-1] || '???';
 }
 // what the next writer is allowed to see: bot lines in full, human lines = last word only
-function prevView(){
-  const last = story[story.length-1];
+function prevViewOf(st){
+  const last = st[st.length-1];
   return last.bot
-    ? { bot:true,  text:last.text,               author:last.author }
-    : { bot:false, text:lastWordOf(last.text),   author:last.author };
+    ? { bot:true,  text:last.text,             author:last.author }
+    : { bot:false, text:lastWordOf(last.text), author:last.author };
 }
 
+function pushLine(st, who, text, timedOut){
+  const t = (text||'').trim();
+  if(t && !isDirty(t)){
+    st.push({ text: t + (timedOut ? ' (⏰ time ran out mid-thought)' : ''), author: who });
+  } else {
+    const filler = TIMEOUT_FILLERS[Math.floor(Math.random()*TIMEOUT_FILLERS.length)];
+    st.push({ text: `${who} ${filler}`, author: '⏰ The Clock', bot: true });
+  }
+}
+
+/* ---------- local (pass the computer) ---------- */
 function advanceTurn(){
   if(turnPtr >= turnOrder.length){ finishGame(); return; }
-  const name = players[turnOrder[turnPtr]];
+  pendingTurn = {
+    name: players[turnOrder[turnPtr]],
+    turnNum: turnPtr+1, total: turnOrder.length, prev: prevViewOf(story)
+  };
+  $('handoffName').textContent = pendingTurn.name;
+  show('handoff');
+}
+$('readyBtn').onclick = () => { if(pendingTurn) openWriteScreen(pendingTurn); };
 
-  // online: someone who rage-quit mid-game forfeits their turn to The Clock
-  if(netMode === 'host' && gone.has(name)){
-    applySentence(name, '', true);
-    return;
-  }
-
-  const info = { name, turnNum: turnPtr+1, total: turnOrder.length, prev: prevView() };
-  if(netMode === 'host'){ broadcast({ t:'turn', ...info }); armHostSafety(name); }
-
-  if(netMode === 'local'){
-    pendingTurn = info;
-    $('handoffName').textContent = name;
-    show('handoff');
-  } else {
-    renderTurn(info);
-  }
+function applySentence(who, text, timedOut){
+  pushLine(story, who, text, timedOut);
+  turnPtr++;
+  advanceTurn();
+}
+function finishGame(){
+  gameRunning = false;
+  doReveal();
 }
 
-// every device decides for itself whether this is its turn
-function renderTurn(info){
-  if(info.name === myName || netMode === 'local') openWriteScreen(info);
-  else openWaitingScreen(info);
+/* ---------- online (everyone at once) ---------- */
+function beginParallel(){
+  parallel = true; gameRunning = true;
+  stories = players.map(() => [{ text: nextPrompt(), author: '🤖 The Machine', bot: true }]);
+  roundNum = 0;
+  startRound();
+}
+// each round, player i moves one story to the right — so no two people
+// ever write on the same story at the same time
+function assignmentFor(playerIdx){ return (playerIdx + roundNum) % players.length; }
+
+function startRound(){
+  submittedThisRound = {};
+  players.forEach((name, i) => {
+    const sIdx = assignmentFor(i);
+    if(gone.has(name)){                       // their device is dead — Clock writes for them
+      submittedThisRound[name] = true;
+      pushLine(stories[sIdx], name, '', true);
+      return;
+    }
+    const info = {
+      t:'turn', parallel:true, storyIdx:sIdx, name,
+      roundNum: roundNum+1, totalRounds: roundsEach,
+      prev: prevViewOf(stories[sIdx])
+    };
+    if(name === myName) openWriteScreen(info);
+    else sendTo(name, info);
+  });
+  if(Object.keys(submittedThisRound).length >= players.length){ endRound(); return; }
+  armRoundSafety();
+  pushProgress();
 }
 
+function hostTakeSentence(name, text, timedOut){
+  if(!gameRunning || !parallel) return;
+  if(submittedThisRound[name]) return;         // already in for this round
+  const i = players.indexOf(name);
+  if(i < 0) return;
+  submittedThisRound[name] = true;
+  pushLine(stories[assignmentFor(i)], name, text, timedOut);
+  pushProgress();
+  if(Object.keys(submittedThisRound).length >= players.length) endRound();
+}
+
+function endRound(){
+  stopRoundSafety();
+  roundNum++;
+  if(roundNum >= roundsEach) finishParallel();
+  else startRound();
+}
+
+function finishParallel(){
+  gameRunning = false;
+  broadcast({ t:'reveal', stories });
+  doReveal();
+}
+
+// nobody should be able to stall the whole room
+let roundSafetyId = null;
+function armRoundSafety(){
+  stopRoundSafety();
+  roundSafetyId = setTimeout(() => {
+    if(!gameRunning || !parallel) return;
+    players.forEach((name, i) => {
+      if(submittedThisRound[name]) return;
+      submittedThisRound[name] = true;
+      gone.add(name);                          // didn't report in — skip them fast next round
+      pushLine(stories[assignmentFor(i)], name, '', true);
+    });
+    endRound();
+  }, (TURN_SECONDS + 4) * 1000);
+}
+function stopRoundSafety(){
+  if(roundSafetyId){ clearTimeout(roundSafetyId); roundSafetyId = null; }
+}
+
+function pushProgress(){
+  const done = Object.keys(submittedThisRound).length;
+  broadcast({ t:'progress', done, total: players.length });
+  showProgress(done, players.length);
+}
+function showProgress(done, total){
+  $('waitProgress').textContent = `${done} of ${total} players have locked it in`;
+}
+
+/* ---------- shared screens ---------- */
 function openWriteScreen(info){
+  iSubmitted = false;
   const p = info.prev;
   if(p.bot){
     $('prevLabel').textContent = 'the story so far (the machine shows u everything!!):';
@@ -729,69 +869,55 @@ function openWriteScreen(info){
     $('prevLabel').textContent = 'the ONLY word u get from the last sentence (good luck!!):';
     $('prevLine').innerHTML = `“ ...${escapeHtml(p.text)} ”<div class="prev-author">— the last word written by ${escapeHtml(p.author)}. thats all u get.</div>`;
   }
-  $('turnTag').innerHTML = `sentence <b>${info.turnNum}</b> of <b>${info.total}</b> — ur up, <b>${escapeHtml(info.name)}</b>!!`;
+  if(info.parallel){
+    roundNum = info.roundNum - 1;
+    myStoryIdx = info.storyIdx;
+    $('turnTag').innerHTML = `📖 ur writing on <b>STORY #${info.storyIdx+1}</b> — round <b>${info.roundNum}</b> of <b>${info.totalRounds}</b> — EVERYONE writes at once!!`;
+  } else {
+    $('turnTag').innerHTML = `sentence <b>${info.turnNum}</b> of <b>${info.total}</b> — ur up, <b>${escapeHtml(info.name)}</b>!!`;
+  }
   box.value = ''; cleanValue = '';
   $('charCount').textContent = '0';
   $('alarm').classList.remove('show');
   show('write');
   box.focus();
-  startTimer(TURN_SECONDS, myTimeUp, $('timer'));
+  startTimer(TURN_SECONDS, myTimeUp);
 }
+let myStoryIdx = -1;
 
-function openWaitingScreen(info){
-  $('waitingName').textContent = info.name;
-  $('waitProgress').textContent = `sentence ${info.turnNum} of ${info.total}`;
+function showLockedIn(){
+  $('waitTimerLabel').textContent = '⏰ ROUND ENDS IN:';
+  $('waitLead').textContent = '✅ ur sentence is LOCKED IN';
+  $('waitingName').textContent = '🎉';
+  $('waitSub').innerHTML = 'waiting for the slow pokes<span class="dots"></span>';
   show('waiting');
-  startTimer(TURN_SECONDS, null, $('waitTimer'));   // display only
 }
-
-$('readyBtn').onclick = () => { if(pendingTurn) openWriteScreen(pendingTurn); };
 
 /* ---- submitting ---- */
-// called on this device when the writer is done (or the clock ran out)
 function submitSentence(text, timedOut){
-  stopTimer();
+  if(iSubmitted) return;
+  iSubmitted = true;
+
   if(netMode === 'guest'){
-    send(hostConn, { t:'sentence', text, timedOut });
-    $('waitingName').textContent = '✅ locked in!';
-    $('waitProgress').textContent = 'waiting for everyone else';
-    $('waitTimer').textContent = '--';
-    $('waitTimer').parentElement.classList.remove('panic');
-    show('waiting');
+    send(hostConn, { t:'sentence', text, timedOut, round: roundNum });
+    showLockedIn();
     return;
   }
-  applySentence(myNameOrCurrent(), text, timedOut);
-}
-function myNameOrCurrent(){
-  return netMode === 'local' ? players[turnOrder[turnPtr]] : myName;
-}
-
-// authoritative — only ever runs on the host (or in local mode)
-function applySentence(who, text, timedOut){
-  stopHostSafety();
-  const t = (text||'').trim();
-  if(t && !isDirty(t)){
-    story.push({ text: t + (timedOut ? ' (⏰ time ran out mid-thought)' : ''), author: who });
-  } else {
-    const filler = TIMEOUT_FILLERS[Math.floor(Math.random()*TIMEOUT_FILLERS.length)];
-    story.push({ text: `${who} ${filler}`, author: '⏰ The Clock', bot: true });
+  if(netMode === 'host' && parallel){
+    showLockedIn();                    // may be replaced instantly if the round ends
+    hostTakeSentence(myName, text, timedOut);
+    return;
   }
-  turnPtr++;
-  advanceTurn();
-}
-
-function finishGame(){
-  gameRunning = false;
-  if(netMode === 'host') broadcast({ t:'reveal', story });
-  doReveal();
+  stopTimer();
+  applySentence(players[turnOrder[turnPtr]], text, timedOut);
 }
 
 /* ---- 60 second doom clock ---- */
 const TURN_SECONDS = 60;
-let timerId = null, timeLeft = TURN_SECONDS, timerEl = null, timerDone = null;
-function startTimer(secs, onDone, el){
+let timerId = null, timeLeft = TURN_SECONDS, timerDone = null;
+function startTimer(secs, onDone){
   stopTimer();
-  timeLeft = secs; timerDone = onDone; timerEl = el || $('timer');
+  timeLeft = secs; timerDone = onDone;
   renderTimer();
   timerId = setInterval(() => {
     timeLeft--;
@@ -802,30 +928,17 @@ function startTimer(secs, onDone, el){
 function stopTimer(){
   if(timerId){ clearInterval(timerId); timerId = null; }
 }
+// both clocks show the same countdown; only one screen is visible at a time,
+// so after you lock in you can still watch the round clock tick down
 function renderTimer(){
-  if(!timerEl) return;
-  timerEl.textContent = String(Math.max(0,timeLeft)).padStart(2,'0');
-  timerEl.parentElement.classList.toggle('panic', timeLeft <= 10);
+  const v = String(Math.max(0,timeLeft)).padStart(2,'0');
+  ['timer','waitTimer'].forEach(id => {
+    const el = $(id); if(!el) return;
+    el.textContent = v;
+    el.parentElement.classList.toggle('panic', timeLeft <= 10);
+  });
 }
-function myTimeUp(){ submitSentence(box.value.trim(), true); }
-
-// host backstop: if a guest's device never reports in, the game moves on anyway
-let hostSafetyId = null;
-function armHostSafety(who){
-  stopHostSafety();
-  if(who === myName) return;   // host's own turn is handled by its own clock
-  hostSafetyId = setTimeout(() => {
-    if(!gameRunning) return;
-    // their device never reported in — assume it's dead so their LATER turns
-    // skip instantly instead of costing everyone another 64s each.
-    // (if they're actually alive, the next message they send un-marks them)
-    gone.add(who);
-    applySentence(who, '', true);
-  }, (TURN_SECONDS + 4) * 1000);
-}
-function stopHostSafety(){
-  if(hostSafetyId){ clearTimeout(hostSafetyId); hostSafetyId = null; }
-}
+function myTimeUp(){ if(!iSubmitted) submitSentence(box.value.trim(), true); }
 
 /* ---- write + live filter ---- */
 const box = $('sentenceBox');
@@ -867,22 +980,29 @@ function doReveal(){
   $('againBtn').textContent = netMode === 'guest'
     ? '⬅ back to the lobby'
     : (netMode === 'host' ? 'ANOTHER ROUND!! 🔁 (everyone comes back)' : 'WRITE ANOTHER ONE!! 🔁');
+  const blocks = parallel ? stories : [story];
+  $('revealTitle').textContent = blocks.length > 1
+    ? `📜 ~*~ThE ${blocks.length} mAsTeRpIeCeS~*~ 📜`
+    : '📜 ~*~ThE mAsTeRpIeCe~*~ 📜';
   const sb = $('storyBox');
-  sb.innerHTML = story.map(l =>
-    `<div class="story-line"><span class="by">${escapeHtml(l.author)}</span><br>${escapeHtml(l.text)}</div>`).join('');
+  sb.innerHTML = blocks.map((st, bi) =>
+    (blocks.length > 1 ? `<div class="story-title reveal-item">📖 STORY #${bi+1}</div>` : '') +
+    st.map(l => `<div class="story-line reveal-item"><span class="by">${escapeHtml(l.author)}</span><br>${escapeHtml(l.text)}</div>`).join('')
+  ).join('');
   $('theEnd').classList.remove('in');
   $('againBtn').classList.add('hidden');
-  const lines = sb.querySelectorAll('.story-line');
-  lines.forEach((el,i) => setTimeout(() => {
+  const items = sb.querySelectorAll('.reveal-item');
+  const step = items.length > 6 ? 280 : 900;   // don't take all lunch break
+  items.forEach((el,i) => setTimeout(() => {
     el.classList.add('in');
-    if(i === lines.length-1){
+    if(i === items.length-1){
       setTimeout(() => {
         $('theEnd').classList.add('in');
         $('againBtn').classList.remove('hidden');
         confetti();
       }, 600);
     }
-  }, 900*i + 300));
+  }, step*i + 300));
 }
 $('againBtn').onclick = () => {
   if(netMode === 'host'){
@@ -917,6 +1037,12 @@ function makeCode(){
 }
 function send(conn, msg){ try{ if(conn && conn.open) conn.send(msg); }catch(e){} }
 function broadcast(msg){ conns.forEach(c => send(c, msg)); }
+// parallel mode sends each player their OWN assignment — never broadcast a
+// turn, or everyone would see every story
+function sendTo(name, msg){
+  const c = conns.find(c => c.playerName === name);
+  if(c) send(c, msg);
+}
 
 function netStatus(el, msg, bad){
   const n = $(el);
@@ -949,6 +1075,7 @@ function createRoom(){
     $('hostControls').classList.remove('hidden');
     $('guestWait').classList.add('hidden');
     $('lobbyStatus').classList.add('hidden');
+    renderShare();
     renderLobby();
     show('lobby');
   });
@@ -975,8 +1102,8 @@ function hostAddConn(conn){
     if(!nm) return;
     if(gameRunning){
       gone.add(nm);                       // their remaining turns go to The Clock
-      // if they vanished on their own turn, don't make everyone wait out the clock
-      if(players[turnOrder[turnPtr]] === nm) applySentence(nm, '', true);
+      // don't make the whole room wait out the clock for someone who left
+      if(parallel) hostTakeSentence(nm, '', true);
     } else {
       players = players.filter(p => p !== nm);
       broadcast({ t:'roster', players });
@@ -1006,9 +1133,8 @@ function hostOnData(conn, m){
 
   if(m.t === 'sentence'){
     if(!gameRunning) return;
-    // ignore anything that isn't from the player whose turn it actually is
-    if(players[turnOrder[turnPtr]] !== conn.playerName) return;
-    applySentence(conn.playerName, String(m.text||'').slice(0,140), !!m.timedOut);
+    if(typeof m.round === 'number' && m.round !== roundNum) return;   // stale, from a finished round
+    hostTakeSentence(conn.playerName, String(m.text||'').slice(0,140), !!m.timedOut);
   }
 }
 
@@ -1058,6 +1184,7 @@ function guestOnData(m){
       $('hostControls').classList.add('hidden');
       $('guestWait').classList.remove('hidden');
       $('lobbyStatus').classList.add('hidden');
+      renderShare();
       renderLobby();
       show('lobby');
       break;
@@ -1072,12 +1199,17 @@ function guestOnData(m){
       break;
     case 'turn':
       gameRunning = true;
-      renderTurn(m);
+      parallel = !!m.parallel;
+      openWriteScreen(m);
+      break;
+    case 'progress':
+      showProgress(m.done, m.total);
       break;
     case 'reveal':
       gameRunning = false;
       stopTimer();
-      story = m.story || [];
+      if(m.stories){ parallel = true; stories = m.stories; }
+      else { parallel = false; story = m.story || []; }
       doReveal();
       break;
     case 'lobby':
@@ -1100,8 +1232,58 @@ function renderLobby(){
     : 'need 2+ players...';
 }
 
+/* ---- invite link + QR ---- */
+function shareUrl(){
+  const base = location.origin + location.pathname.replace(/index\.html$/, '');
+  return base + '?room=' + roomCode;
+}
+function renderShare(){
+  const url = shareUrl();
+  $('shareLink').value = url;
+  const box = $('qrBox');
+  if(location.protocol === 'file:'){
+    box.innerHTML = '<p style="font-weight:bold;padding:12px;font-size:13px;max-width:220px">' +
+      '(the QR + link only work once the game is on a real website — ' +
+      'opening it as a file means theres no address to share!)</p>';
+    return;
+  }
+  try{
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 1, scalable: true });
+  }catch(e){
+    box.innerHTML = '<p style="font-weight:bold;padding:12px">(couldnt draw a QR code)</p>';
+  }
+}
+$('copyLink').onclick = async () => {
+  const url = $('shareLink').value;
+  try{
+    await navigator.clipboard.writeText(url);
+  }catch(e){
+    $('shareLink').select();
+    try{ document.execCommand('copy'); }catch(_){}
+  }
+  $('copyLink').textContent = 'COPIED!! ✅';
+  setTimeout(() => { $('copyLink').textContent = 'COPY 📋'; }, 1600);
+};
+
+// someone opened a ?room=XXXX invite link — jump straight to the join screen
+(function(){
+  const p = new URLSearchParams(location.search);
+  const r = (p.get('room')||'').toUpperCase().replace(/[^A-Z]/g,'');
+  if(r.length !== 4) return;
+  $('joinCode').value = r;
+  $('modeOnline').classList.add('on');
+  $('modeLocal').classList.remove('on');
+  show('online');
+  netStatus('onlineStatus', '🔗 room ' + r + ' is waiting for u — just type ur name and hit JOIN!', false);
+  $('netName').focus();
+})();
+
 function cleanupNet(){
-  stopTimer(); stopHostSafety();
+  stopTimer(); stopRoundSafety();
+  parallel = false; stories = []; roundNum = 0; submittedThisRound = {};
   try{ conns.forEach(c => c.close()); }catch(e){}
   try{ if(hostConn) hostConn.close(); }catch(e){}
   try{ if(peer) peer.destroy(); }catch(e){}
