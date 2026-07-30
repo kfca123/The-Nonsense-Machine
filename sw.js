@@ -1,9 +1,10 @@
 // bump this version string whenever any file changes, or users keep the old cached version
 // (also bump APP_VERSION in index.html so the settings section shows the same number)
-const CACHE = 'nonsense-v4';
+const CACHE = 'nonsense-v7';
 const FILES = [
   './',
   './index.html',
+  './peerjs.min.js',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',

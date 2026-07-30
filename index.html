@@ -9,9 +9,16 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#00ff00">
 <style>
+  /* NOTE: no bare `cursive` fallback — phones don't have Comic Sans and
+     `cursive` resolves to script fonts (Snell Roundhand on iOS) = unreadable.
+     Chalkboard SE (iOS) / Verdana keep the goofy look but stay legible. */
+  :root{
+    --goofy:"Comic Sans MS","Comic Sans","Chalkboard SE","Comic Neue",Verdana,Geneva,sans-serif;
+    --chunky:Impact,"Arial Black","Haettenschweiler",Verdana,sans-serif;
+  }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    font-family:"Comic Sans MS", "Comic Sans", cursive;
+    font-family:var(--goofy);
     color:#000;
     min-height:100vh;
     /* eye-searing checkerboard, a GeoCities classic */
@@ -32,7 +39,7 @@
     box-shadow:8px 8px 0 #000;
   }
   h1{
-    font-family:Impact, "Arial Black", sans-serif;
+    font-family:var(--chunky);
     font-size:54px; text-align:center; letter-spacing:2px;
     color:#ff00ff;
     text-shadow:3px 3px 0 #00ffff, 6px 6px 0 #0000ff, 9px 9px 0 #000;
@@ -71,13 +78,13 @@
   input[type=text], textarea{
     background:#fff; border:4px inset #808080;
     color:#000; padding:10px 14px; font-size:16px; width:100%;
-    font-family:"Comic Sans MS", cursive; outline:none;
+    font-family:var(--goofy); outline:none;
   }
   textarea{resize:none; height:110px; line-height:1.5;}
   .btn{
     border:5px outset #c0c0c0; background:#c0c0c0;
     padding:10px 22px; font-size:16px; font-weight:bold; cursor:pointer;
-    font-family:"Comic Sans MS", cursive; color:#000;
+    font-family:var(--goofy); color:#000;
   }
   .btn:hover{background:#00ff00;}
   .btn:active{border-style:inset;}
@@ -103,7 +110,7 @@
   .handoff{text-align:center;}
   .handoff .who{
     font-size:46px; font-weight:bold; color:#0000ff; margin:8px 0;
-    font-family:Impact, sans-serif; text-shadow:3px 3px 0 #00ff00;
+    font-family:var(--chunky); text-shadow:3px 3px 0 #00ff00;
     text-decoration:underline wavy #ff0000;
   }
   .handoff p{font-size:17px; font-weight:bold;}
@@ -163,12 +170,12 @@
   .story-line:nth-child(4n+4){background:#ffccff;}
   .the-end{
     text-align:center; font-size:38px; margin-top:16px; opacity:0; transition:opacity .8s;
-    font-family:Impact, sans-serif; color:#ff0000; text-shadow:3px 3px 0 #ffff00, 5px 5px 0 #000;
+    font-family:var(--chunky); color:#ff0000; text-shadow:3px 3px 0 #ffff00, 5px 5px 0 #000;
   }
   .the-end.in{opacity:1;}
   h2{
     font-size:34px; text-align:center; margin-bottom:16px;
-    font-family:Impact, sans-serif; color:#0000ff; text-shadow:3px 3px 0 #00ffff;
+    font-family:var(--chunky); color:#0000ff; text-shadow:3px 3px 0 #00ffff;
   }
   .confetti{position:fixed; top:-20px; font-size:24px; animation:fall linear forwards; z-index:99;}
   @keyframes fall{to{transform:translateY(110vh) rotate(720deg);}}
@@ -184,6 +191,70 @@
   .webring{color:#00ffff; text-decoration:underline; cursor:pointer;}
 
   .ver-tag{margin-top:10px; font-size:13px; font-weight:bold; color:#0000ff;}
+
+  /* ---- online mode ---- */
+  .mode-btns{display:flex; gap:10px; margin-bottom:6px;}
+  .mode-btns .btn{flex:1; font-size:15px; padding:12px 8px;}
+  .mode-btns .btn.on{background:#00ff00; border-style:inset;}
+  .room-code{
+    text-align:center; background:#000; color:#00ff00; font-family:"Courier New", monospace;
+    font-size:52px; font-weight:bold; letter-spacing:12px; padding:14px 0 14px 12px;
+    border:5px ridge #00ff00; margin:8px 0; word-break:break-all;
+  }
+  .net-status{
+    text-align:center; font-size:15px; font-weight:bold; margin-top:10px;
+    padding:8px; border:3px dashed #0000ff; background:#fff;
+  }
+  .net-status.bad{border-color:#ff0000; color:#ff0000; background:#ffe0e0;}
+  .lobby-list{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; min-height:40px;}
+  .lobby-list .chip{background:#ffff00;}
+  .lobby-list .chip.me{background:#00ff00;}
+  .waiting{text-align:center;}
+  .waiting .who{
+    font-size:40px; font-weight:bold; color:#0000ff; margin:8px 0;
+    font-family:var(--chunky); text-shadow:3px 3px 0 #00ff00;
+  }
+  .dots::after{content:'...'; animation:dots 1.2s steps(4) infinite; }
+  @keyframes dots{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}}
+
+  /* ============ MOBILE ============ */
+  @media (max-width:640px){
+    body{background-size:36px 36px; cursor:default;}
+    .stage{padding:6px 0 30px;}
+    .card{padding:16px 13px; border-width:5px; box-shadow:5px 5px 0 #000;}
+    marquee{font-size:14px; border-width:3px;}
+    h1{
+      font-size:30px; letter-spacing:0; transform:rotate(-1deg);
+      text-shadow:2px 2px 0 #00ffff, 4px 4px 0 #000; -webkit-text-stroke:1px #000;
+    }
+    .tagline{font-size:14px;}
+    .big-emoji{font-size:44px;}
+    .construction{font-size:11px; letter-spacing:0;}
+    .section-label{font-size:15px; margin:16px 0 6px;}
+    .chip{font-size:15px;}
+    /* inputs must stay >=16px or iOS auto-zooms the whole page */
+    input[type=text], textarea{font-size:16px;}
+    textarea{height:130px;}
+    .row{flex-direction:column;}
+    .btn{font-size:16px; padding:12px 14px;}
+    .btn-main{font-size:18px; padding:14px; margin-top:16px;}
+    .rounds{flex-wrap:wrap;}
+    .mode-btns{flex-direction:column;}
+    .prev-line{font-size:17px; padding:12px 14px; border-width:4px;}
+    .prev-author{font-size:13px;}
+    .turn-tag{font-size:15px;}
+    .handoff .who, .waiting .who{font-size:30px;}
+    .handoff p{font-size:15px;}
+    .secret{font-size:19px;}
+    .timer-box{font-size:15px; padding:6px;}
+    .timer{font-size:22px; letter-spacing:2px;}
+    .alarm{font-size:14px; padding:10px 12px;}
+    .story-line{font-size:16px; padding:10px 13px;}
+    h2{font-size:24px;}
+    .the-end{font-size:28px;}
+    .room-code{font-size:38px; letter-spacing:8px; padding-left:8px;}
+    .footer{font-size:12px; line-height:1.6;}
+  }
 
   /* ============ MODERN THEME (a.k.a. boring mode) ============ */
   body.modern{
@@ -254,6 +325,17 @@
   body.modern .footer .counter{color:#6366f1; border:none; background:#eef2ff; border-radius:6px;}
   body.modern .webring{color:#6366f1;}
   body.modern .ver-tag{color:#9ca3af;}
+  body.modern .mode-btns .btn.on{background:#6366f1; color:#fff;}
+  body.modern .room-code{
+    background:#1c2340; border:none; border-radius:14px; color:#38bdf8;
+  }
+  body.modern .net-status{
+    border:1px solid #c7d2fe; border-radius:12px; background:#eef2ff; color:#4338ca;
+  }
+  body.modern .net-status.bad{border-color:#fecaca; background:#fef2f2; color:#b91c1c;}
+  body.modern .lobby-list .chip{background:#eef2ff;}
+  body.modern .lobby-list .chip.me{background:#dcfce7; border-color:#86efac; color:#166534;}
+  body.modern .waiting .who{font-family:inherit; color:#6366f1; text-shadow:none; font-weight:800;}
 </style>
 </head>
 <body>
@@ -268,21 +350,29 @@
     <p class="tagline">!!! EVERYONE ADDS ONE SENTENCE !!! U ONLY SEE THE LAST ONE !!!</p>
     <div class="construction">🚧🚧 UNDER CONSTRUCTION SINCE 1998 🚧🚧</div>
 
-    <div class="section-label">Who's playing?? (2–8) <span class="new-badge">NEW!!</span></div>
-    <div class="players" id="playerChips"></div>
-    <div class="row">
-      <input type="text" id="nameInput" maxlength="16" placeholder="type ur name here...">
-      <button class="btn btn-sub" id="addPlayer">ADD ➕</button>
+    <div class="section-label">how r u playing?? <span class="new-badge">NEW!!</span></div>
+    <div class="mode-btns">
+      <button class="btn btn-sub on" id="modeLocal">🖥 ONE COMPUTER<br>(pass it around)</button>
+      <button class="btn btn-sub" id="modeOnline">🌐 ONLINE<br>(everyone on their own device)</button>
     </div>
 
-    <div class="section-label">How many sentences each???</div>
-    <div class="rounds" id="roundBtns">
-      <button class="btn btn-sub" data-r="1">1</button>
-      <button class="btn btn-sub on" data-r="2">2</button>
-      <button class="btn btn-sub" data-r="3">3</button>
-    </div>
+    <div id="localSetup">
+      <div class="section-label">Who's playing?? (2–8)</div>
+      <div class="players" id="playerChips"></div>
+      <div class="row">
+        <input type="text" id="nameInput" maxlength="16" placeholder="type ur name here...">
+        <button class="btn btn-sub" id="addPlayer">ADD ➕</button>
+      </div>
 
-    <button class="btn btn-main" id="startBtn" disabled>need at least 2 players...</button>
+      <div class="section-label">How many sentences each???</div>
+      <div class="rounds" id="roundBtns">
+        <button class="btn btn-sub" data-r="1">1</button>
+        <button class="btn btn-sub on" data-r="2">2</button>
+        <button class="btn btn-sub" data-r="3">3</button>
+      </div>
+
+      <button class="btn btn-main" id="startBtn" disabled>need at least 2 players...</button>
+    </div>
 
     <div class="section-label">⚙ settings</div>
     <div class="rounds" id="themeBtns">
@@ -297,6 +387,63 @@
       <span class="webring" onclick="alert('the webring died in 2003. we miss it every day.')">JOIN OUR WEBRING</span><br>
       (C) 1998 nonsense industries. all rights reversed.
     </div>
+  </div>
+
+  <!-- ONLINE: create or join -->
+  <div class="card hidden" id="online">
+    <span class="big-emoji">🌐</span>
+    <h1>PlAy OnLiNe</h1>
+    <p class="tagline">!!! EVERYONE USES THEIR OWN DEVICE !!! NO PEEKING POSSIBLE !!!</p>
+
+    <div class="section-label">ur name:</div>
+    <input type="text" id="netName" maxlength="16" placeholder="type ur name here...">
+
+    <div class="section-label">start a NEW room:</div>
+    <button class="btn btn-main" id="createBtn" style="margin-top:0;">🎪 CREATE ROOM</button>
+
+    <div class="section-label">...or JOIN a friends room:</div>
+    <div class="row">
+      <input type="text" id="joinCode" maxlength="4" placeholder="4 letter code" style="text-transform:uppercase;">
+      <button class="btn btn-sub" id="joinBtn">JOIN ➡</button>
+    </div>
+
+    <div class="net-status hidden" id="onlineStatus"></div>
+    <button class="btn btn-sub" id="backBtn" style="width:100%; margin-top:18px;">⬅ back</button>
+  </div>
+
+  <!-- LOBBY -->
+  <div class="card hidden" id="lobby">
+    <span class="big-emoji">🎪</span>
+    <h2 style="margin-bottom:6px;">ROOM CODE</h2>
+    <p style="text-align:center; font-size:14px; font-weight:bold;">tell ur friends to type this in!!</p>
+    <div class="room-code" id="roomCode">????</div>
+
+    <div class="section-label">whos here (<span id="lobbyCount">0</span>/8):</div>
+    <div class="lobby-list" id="lobbyList"></div>
+
+    <div id="hostControls">
+      <div class="section-label">How many sentences each???</div>
+      <div class="rounds" id="roundBtnsNet">
+        <button class="btn btn-sub" data-r="1">1</button>
+        <button class="btn btn-sub on" data-r="2">2</button>
+        <button class="btn btn-sub" data-r="3">3</button>
+      </div>
+      <button class="btn btn-main" id="netStartBtn" disabled>need 2+ players...</button>
+    </div>
+    <div id="guestWait" class="net-status hidden">⏳ waiting for the host to start the game<span class="dots"></span></div>
+
+    <div class="net-status hidden" id="lobbyStatus"></div>
+    <button class="btn btn-sub" id="leaveBtn" style="width:100%; margin-top:18px;">🚪 leave room</button>
+  </div>
+
+  <!-- WAITING (online, not ur turn) -->
+  <div class="card waiting hidden" id="waiting">
+    <div class="timer-box">⏰ THEY HAVE: <span class="timer" id="waitTimer">60</span> ⏰</div>
+    <span class="big-emoji">✍️</span>
+    <p style="font-size:17px; font-weight:bold;">currently writing:</p>
+    <div class="who" id="waitingName">???</div>
+    <p style="font-size:15px; font-weight:bold;">sit tight, ur turn is coming<span class="dots"></span></p>
+    <div class="net-status" id="waitProgress"></div>
   </div>
 
   <!-- HANDOFF -->
@@ -332,6 +479,7 @@
 
 </div>
 
+<script src="peerjs.min.js"></script>
 <script>
 /* ---------------- PROFANITY SHIELD ----------------
    Blocks bad words AS YOU TYPE — including l33t tricks
@@ -462,11 +610,11 @@ let story = [];         // {text, author}
 let cleanValue = "";
 
 const $ = id => document.getElementById(id);
-const screens = ['setup','handoff','write','reveal'];
+const screens = ['setup','online','lobby','handoff','write','waiting','reveal'];
 function show(id){ screens.forEach(s => $(s).classList.toggle('hidden', s!==id)); }
 
 /* ---- version (keep in sync with the CACHE name in sw.js) ---- */
-const APP_VERSION = 'v4';
+const APP_VERSION = 'v7';
 $('verTag').textContent = APP_VERSION;
 
 /* ---- theme picker ---- */
@@ -517,75 +665,166 @@ $('roundBtns').querySelectorAll('.btn').forEach(b => b.onclick = () => {
 });
 renderChips();
 
-$('startBtn').onclick = () => {
+$('startBtn').onclick = () => { netMode = 'local'; beginGame(); };
+
+/* ================= GAME LOOP (shared by local + online) ================= */
+let gameRunning = false;
+let pendingTurn = null;   // turn info waiting behind the local handoff screen
+
+function beginGame(){
   turnOrder = [];
   for(let r=0; r<roundsEach; r++) for(let i=0; i<players.length; i++) turnOrder.push(i);
   turnPtr = 0;
   story = [{ text: nextPrompt(), author: '🤖 The Machine', bot: true }];
-  nextHandoff();
-};
-
-/* ---- handoff ---- */
-function nextHandoff(){
-  $('handoffName').textContent = players[turnOrder[turnPtr]];
-  show('handoff');
+  gameRunning = true;
+  advanceTurn();
 }
+
 function lastWordOf(text){
   const w = text.trim().split(/\s+/);
   return w[w.length-1] || '???';
 }
-$('readyBtn').onclick = () => {
+// what the next writer is allowed to see: bot lines in full, human lines = last word only
+function prevView(){
   const last = story[story.length-1];
-  if(last.bot){
-    // bot lines get shown in FULL (the machine is generous)
+  return last.bot
+    ? { bot:true,  text:last.text,               author:last.author }
+    : { bot:false, text:lastWordOf(last.text),   author:last.author };
+}
+
+function advanceTurn(){
+  if(turnPtr >= turnOrder.length){ finishGame(); return; }
+  const name = players[turnOrder[turnPtr]];
+
+  // online: someone who rage-quit mid-game forfeits their turn to The Clock
+  if(netMode === 'host' && gone.has(name)){
+    applySentence(name, '', true);
+    return;
+  }
+
+  const info = { name, turnNum: turnPtr+1, total: turnOrder.length, prev: prevView() };
+  if(netMode === 'host'){ broadcast({ t:'turn', ...info }); armHostSafety(name); }
+
+  if(netMode === 'local'){
+    pendingTurn = info;
+    $('handoffName').textContent = name;
+    show('handoff');
+  } else {
+    renderTurn(info);
+  }
+}
+
+// every device decides for itself whether this is its turn
+function renderTurn(info){
+  if(info.name === myName || netMode === 'local') openWriteScreen(info);
+  else openWaitingScreen(info);
+}
+
+function openWriteScreen(info){
+  const p = info.prev;
+  if(p.bot){
     $('prevLabel').textContent = 'the story so far (the machine shows u everything!!):';
-    $('prevLine').innerHTML = `“ ${escapeHtml(last.text)} ”<div class="prev-author">— ${escapeHtml(last.author)}</div>`;
+    $('prevLine').innerHTML = `“ ${escapeHtml(p.text)} ”<div class="prev-author">— ${escapeHtml(p.author)}</div>`;
   } else {
     $('prevLabel').textContent = 'the ONLY word u get from the last sentence (good luck!!):';
-    $('prevLine').innerHTML = `“ ...${escapeHtml(lastWordOf(last.text))} ”<div class="prev-author">— the last word written by ${escapeHtml(last.author)}. thats all u get.</div>`;
+    $('prevLine').innerHTML = `“ ...${escapeHtml(p.text)} ”<div class="prev-author">— the last word written by ${escapeHtml(p.author)}. thats all u get.</div>`;
   }
-  $('turnTag').innerHTML = `sentence <b>${turnPtr+1}</b> of <b>${turnOrder.length}</b> — ur up, <b>${escapeHtml(players[turnOrder[turnPtr]])}</b>!!`;
-  $('sentenceBox').value = ''; cleanValue = '';
+  $('turnTag').innerHTML = `sentence <b>${info.turnNum}</b> of <b>${info.total}</b> — ur up, <b>${escapeHtml(info.name)}</b>!!`;
+  box.value = ''; cleanValue = '';
   $('charCount').textContent = '0';
   $('alarm').classList.remove('show');
   show('write');
-  $('sentenceBox').focus();
-  startTimer();
-};
+  box.focus();
+  startTimer(TURN_SECONDS, myTimeUp, $('timer'));
+}
+
+function openWaitingScreen(info){
+  $('waitingName').textContent = info.name;
+  $('waitProgress').textContent = `sentence ${info.turnNum} of ${info.total}`;
+  show('waiting');
+  startTimer(TURN_SECONDS, null, $('waitTimer'));   // display only
+}
+
+$('readyBtn').onclick = () => { if(pendingTurn) openWriteScreen(pendingTurn); };
+
+/* ---- submitting ---- */
+// called on this device when the writer is done (or the clock ran out)
+function submitSentence(text, timedOut){
+  stopTimer();
+  if(netMode === 'guest'){
+    send(hostConn, { t:'sentence', text, timedOut });
+    $('waitingName').textContent = '✅ locked in!';
+    $('waitProgress').textContent = 'waiting for everyone else';
+    $('waitTimer').textContent = '--';
+    $('waitTimer').parentElement.classList.remove('panic');
+    show('waiting');
+    return;
+  }
+  applySentence(myNameOrCurrent(), text, timedOut);
+}
+function myNameOrCurrent(){
+  return netMode === 'local' ? players[turnOrder[turnPtr]] : myName;
+}
+
+// authoritative — only ever runs on the host (or in local mode)
+function applySentence(who, text, timedOut){
+  stopHostSafety();
+  const t = (text||'').trim();
+  if(t && !isDirty(t)){
+    story.push({ text: t + (timedOut ? ' (⏰ time ran out mid-thought)' : ''), author: who });
+  } else {
+    const filler = TIMEOUT_FILLERS[Math.floor(Math.random()*TIMEOUT_FILLERS.length)];
+    story.push({ text: `${who} ${filler}`, author: '⏰ The Clock', bot: true });
+  }
+  turnPtr++;
+  advanceTurn();
+}
+
+function finishGame(){
+  gameRunning = false;
+  if(netMode === 'host') broadcast({ t:'reveal', story });
+  doReveal();
+}
 
 /* ---- 60 second doom clock ---- */
 const TURN_SECONDS = 60;
-let timerId = null, timeLeft = TURN_SECONDS;
-function startTimer(){
+let timerId = null, timeLeft = TURN_SECONDS, timerEl = null, timerDone = null;
+function startTimer(secs, onDone, el){
   stopTimer();
-  timeLeft = TURN_SECONDS;
+  timeLeft = secs; timerDone = onDone; timerEl = el || $('timer');
   renderTimer();
   timerId = setInterval(() => {
     timeLeft--;
     renderTimer();
-    if(timeLeft <= 0){ stopTimer(); timeUp(); }
+    if(timeLeft <= 0){ stopTimer(); if(timerDone) timerDone(); }
   }, 1000);
 }
 function stopTimer(){
   if(timerId){ clearInterval(timerId); timerId = null; }
 }
 function renderTimer(){
-  $('timer').textContent = String(Math.max(0,timeLeft)).padStart(2,'0');
-  $('timer').parentElement.classList.toggle('panic', timeLeft <= 10);
+  if(!timerEl) return;
+  timerEl.textContent = String(Math.max(0,timeLeft)).padStart(2,'0');
+  timerEl.parentElement.classList.toggle('panic', timeLeft <= 10);
 }
-function timeUp(){
-  const t = box.value.trim();
-  const who = players[turnOrder[turnPtr]];
-  if(t && !isDirty(t)){
-    // submit whatever they had, ready or not
-    story.push({ text: t + ' (⏰ time ran out mid-thought)', author: who });
-  } else {
-    const filler = TIMEOUT_FILLERS[Math.floor(Math.random()*TIMEOUT_FILLERS.length)];
-    story.push({ text: `${who} ${filler}`, author: '⏰ The Clock', bot: true });
-  }
-  turnPtr++;
-  if(turnPtr >= turnOrder.length) doReveal();
-  else nextHandoff();
+function myTimeUp(){ submitSentence(box.value.trim(), true); }
+
+// host backstop: if a guest's device never reports in, the game moves on anyway
+let hostSafetyId = null;
+function armHostSafety(who){
+  stopHostSafety();
+  if(who === myName) return;   // host's own turn is handled by its own clock
+  hostSafetyId = setTimeout(() => {
+    if(!gameRunning) return;
+    // their device never reported in — assume it's dead so their LATER turns
+    // skip instantly instead of costing everyone another 64s each.
+    // (if they're actually alive, the next message they send un-marks them)
+    gone.add(who);
+    applySentence(who, '', true);
+  }, (TURN_SECONDS + 4) * 1000);
+}
+function stopHostSafety(){
+  if(hostSafetyId){ clearTimeout(hostSafetyId); hostSafetyId = null; }
 }
 
 /* ---- write + live filter ---- */
@@ -619,16 +858,15 @@ $('submitBtn').onclick = () => {
   const t = box.value.trim();
   if(!t) return;
   if(isDirty(t)){ fireAlarm(); return; }
-  stopTimer();
-  story.push({ text:t, author: players[turnOrder[turnPtr]] });
-  turnPtr++;
-  if(turnPtr >= turnOrder.length) doReveal();
-  else nextHandoff();
+  submitSentence(t, false);
 };
 
 /* ---- reveal ---- */
 function doReveal(){
   show('reveal');
+  $('againBtn').textContent = netMode === 'guest'
+    ? '⬅ back to the lobby'
+    : (netMode === 'host' ? 'ANOTHER ROUND!! 🔁 (everyone comes back)' : 'WRITE ANOTHER ONE!! 🔁');
   const sb = $('storyBox');
   sb.innerHTML = story.map(l =>
     `<div class="story-line"><span class="by">${escapeHtml(l.author)}</span><br>${escapeHtml(l.text)}</div>`).join('');
@@ -646,7 +884,261 @@ function doReveal(){
     }
   }, 900*i + 300));
 }
-$('againBtn').onclick = () => { show('setup'); renderChips(); };
+$('againBtn').onclick = () => {
+  if(netMode === 'host'){
+    broadcast({ t:'lobby' });
+    gone.clear();
+    renderLobby();
+    show('lobby');
+  } else if(netMode === 'guest'){
+    show('lobby');
+  } else {
+    show('setup'); renderChips();
+  }
+};
+
+/* ==================== ONLINE MODE (peer to peer) ====================
+   One player hosts (their device is the referee and holds the story),
+   everyone else connects with a 4 letter room code. No accounts, no
+   server of our own — PeerJS's free public broker just introduces the
+   devices to each other, then they talk directly. */
+let netMode = 'local';        // 'local' | 'host' | 'guest'
+let peer = null, conns = [], hostConn = null;
+let myName = '', roomCode = '';
+const gone = new Set();       // players who disconnected mid-game
+
+const CODE_LETTERS = 'ABCDEFGHJKMNPQRSTUVWXYZ';   // no I/L/O — too easy to misread
+const PEER_PREFIX = 'nonsense98-';
+
+function makeCode(){
+  let s = '';
+  for(let i=0;i<4;i++) s += CODE_LETTERS[Math.floor(Math.random()*CODE_LETTERS.length)];
+  return s;
+}
+function send(conn, msg){ try{ if(conn && conn.open) conn.send(msg); }catch(e){} }
+function broadcast(msg){ conns.forEach(c => send(c, msg)); }
+
+function netStatus(el, msg, bad){
+  const n = $(el);
+  n.textContent = msg;
+  n.classList.remove('hidden');
+  n.classList.toggle('bad', !!bad);
+}
+function checkName(){
+  const n = $('netName').value.trim();
+  if(!n){ netStatus('onlineStatus','⚠ type ur name first!!', true); return null; }
+  if(isDirty(n)){ netStatus('onlineStatus','🚨 keep names school-safe!!', true); return null; }
+  return n;
+}
+
+/* ---- host ---- */
+let codeAttempts = 0;
+function createRoom(){
+  const n = checkName(); if(!n) return;
+  myName = n;
+  roomCode = makeCode();
+  netStatus('onlineStatus','📡 dialing up the internet...', false);
+  peer = new Peer(PEER_PREFIX + roomCode, { debug: 0 });
+
+  peer.on('open', () => {
+    codeAttempts = 0;
+    netMode = 'host';
+    players = [myName];
+    gone.clear();
+    $('roomCode').textContent = roomCode;
+    $('hostControls').classList.remove('hidden');
+    $('guestWait').classList.add('hidden');
+    $('lobbyStatus').classList.add('hidden');
+    renderLobby();
+    show('lobby');
+  });
+
+  peer.on('connection', conn => hostAddConn(conn));
+
+  peer.on('error', e => {
+    if(e.type === 'unavailable-id' && codeAttempts < 5){
+      // that code is taken right now — roll another one
+      codeAttempts++;
+      try{ peer.destroy(); }catch(_){}
+      createRoom();
+      return;
+    }
+    netStatus('onlineStatus', '❌ couldnt connect (' + e.type + '). check the wifi and try again.', true);
+  });
+}
+
+function hostAddConn(conn){
+  conn.on('data', m => hostOnData(conn, m));
+  conn.on('close', () => {
+    const nm = conn.playerName;
+    conns = conns.filter(c => c !== conn);
+    if(!nm) return;
+    if(gameRunning){
+      gone.add(nm);                       // their remaining turns go to The Clock
+      // if they vanished on their own turn, don't make everyone wait out the clock
+      if(players[turnOrder[turnPtr]] === nm) applySentence(nm, '', true);
+    } else {
+      players = players.filter(p => p !== nm);
+      broadcast({ t:'roster', players });
+      renderLobby();
+    }
+  });
+}
+
+function hostOnData(conn, m){
+  if(!m || typeof m !== 'object') return;
+  if(conn.playerName) gone.delete(conn.playerName);   // they're alive after all
+
+  if(m.t === 'hello'){
+    const nm = String(m.name||'').trim().slice(0,16);
+    if(!nm || isDirty(nm))      return send(conn, { t:'kick', reason:'that name isnt allowed' });
+    if(gameRunning)             return send(conn, { t:'kick', reason:'that game already started! wait for the next round' });
+    if(players.includes(nm))    return send(conn, { t:'kick', reason:'someone in there is already called ' + nm });
+    if(players.length >= 8)     return send(conn, { t:'kick', reason:'room is FULL (8 players max)' });
+    conn.playerName = nm;
+    conns.push(conn);
+    players.push(nm);
+    send(conn, { t:'joined', code: roomCode });
+    broadcast({ t:'roster', players });
+    renderLobby();
+    return;
+  }
+
+  if(m.t === 'sentence'){
+    if(!gameRunning) return;
+    // ignore anything that isn't from the player whose turn it actually is
+    if(players[turnOrder[turnPtr]] !== conn.playerName) return;
+    applySentence(conn.playerName, String(m.text||'').slice(0,140), !!m.timedOut);
+  }
+}
+
+/* ---- guest ---- */
+function joinRoom(){
+  const n = checkName(); if(!n) return;
+  const code = $('joinCode').value.trim().toUpperCase();
+  if(code.length !== 4){ netStatus('onlineStatus','⚠ the code is 4 letters!!', true); return; }
+  myName = n;
+  netStatus('onlineStatus','📡 knocking on room ' + code + '...', false);
+  peer = new Peer({ debug: 0 });
+
+  peer.on('open', () => {
+    hostConn = peer.connect(PEER_PREFIX + code, { reliable: true });
+    hostConn.on('open', () => { send(hostConn, { t:'hello', name: myName }); });
+    hostConn.on('data', m => guestOnData(m));
+    hostConn.on('close', () => {
+      if(netMode !== 'guest') return;
+      stopTimer();
+      cleanupNet();
+      show('online');
+      netStatus('onlineStatus','👋 the host left, so the room closed. start ur own?', true);
+    });
+    setTimeout(() => {
+      if(netMode !== 'guest'){
+        netStatus('onlineStatus','❌ no room called "'+code+'" — check the letters (and that they made a room)', true);
+      }
+    }, 9000);
+  });
+
+  peer.on('error', e => {
+    if(netMode === 'guest') return;
+    const why = e.type === 'peer-unavailable'
+      ? '❌ no room called "'+code+'" — double check the letters'
+      : '❌ couldnt connect ('+e.type+'). check the wifi.';
+    netStatus('onlineStatus', why, true);
+  });
+}
+
+function guestOnData(m){
+  if(!m || typeof m !== 'object') return;
+  switch(m.t){
+    case 'joined':
+      netMode = 'guest';
+      roomCode = m.code;
+      $('roomCode').textContent = roomCode;
+      $('hostControls').classList.add('hidden');
+      $('guestWait').classList.remove('hidden');
+      $('lobbyStatus').classList.add('hidden');
+      renderLobby();
+      show('lobby');
+      break;
+    case 'roster':
+      players = m.players || [];
+      renderLobby();
+      break;
+    case 'kick':
+      cleanupNet();
+      show('online');
+      netStatus('onlineStatus', '❌ ' + m.reason, true);
+      break;
+    case 'turn':
+      gameRunning = true;
+      renderTurn(m);
+      break;
+    case 'reveal':
+      gameRunning = false;
+      stopTimer();
+      story = m.story || [];
+      doReveal();
+      break;
+    case 'lobby':
+      stopTimer();
+      show('lobby');
+      break;
+  }
+}
+
+/* ---- lobby ---- */
+function renderLobby(){
+  $('lobbyList').innerHTML = players.map(p =>
+    `<span class="chip${p===myName?' me':''}">${escapeHtml(p)}${p===myName?' (u)':''}</span>`
+  ).join('') || '<span style="font-weight:bold;color:#808080">nobody yet... 🦗</span>';
+  $('lobbyCount').textContent = players.length;
+  const ok = players.length >= 2;
+  $('netStartBtn').disabled = !ok;
+  $('netStartBtn').textContent = ok
+    ? `START THE CHAOS!! 🎬 (${players.length} players)`
+    : 'need 2+ players...';
+}
+
+function cleanupNet(){
+  stopTimer(); stopHostSafety();
+  try{ conns.forEach(c => c.close()); }catch(e){}
+  try{ if(hostConn) hostConn.close(); }catch(e){}
+  try{ if(peer) peer.destroy(); }catch(e){}
+  peer = null; conns = []; hostConn = null;
+  netMode = 'local'; gameRunning = false;
+  players = []; gone.clear();
+}
+
+/* ---- wiring ---- */
+$('modeLocal').onclick = () => {
+  $('modeLocal').classList.add('on'); $('modeOnline').classList.remove('on');
+  $('localSetup').classList.remove('hidden');
+};
+$('modeOnline').onclick = () => {
+  $('modeOnline').classList.add('on'); $('modeLocal').classList.remove('on');
+  $('onlineStatus').classList.add('hidden');
+  show('online');
+};
+$('backBtn').onclick = () => {
+  cleanupNet();
+  $('modeLocal').click();
+  show('setup'); renderChips();
+};
+$('createBtn').onclick = createRoom;
+$('joinBtn').onclick = joinRoom;
+$('joinCode').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
+$('netName').addEventListener('keydown', e => { if(e.key==='Enter') createRoom(); });
+$('leaveBtn').onclick = () => {
+  cleanupNet();
+  show('online');
+  $('onlineStatus').classList.add('hidden');
+};
+$('netStartBtn').onclick = () => { if(netMode === 'host' && players.length >= 2) beginGame(); };
+$('roundBtnsNet').querySelectorAll('.btn').forEach(b => b.onclick = () => {
+  roundsEach = +b.dataset.r;
+  $('roundBtnsNet').querySelectorAll('.btn').forEach(x => x.classList.toggle('on', x===b));
+});
 
 function confetti(){
   const bits = ['🎉','📖','✨','🐍','🎊','🤪','💾','📼'];
